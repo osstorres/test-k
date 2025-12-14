@@ -1,4 +1,3 @@
-
 from functools import lru_cache
 from contextlib import asynccontextmanager
 import decouple
@@ -26,12 +25,10 @@ class SettingsFactory:
         self.environment = environment
 
     def __call__(self) -> ApplicationSettings:
-        """Create settings instance based on environment."""
         if self.environment == Environment.DEVELOPMENT.value:
             return DevSettings()
         if self.environment == Environment.LOCAL.value:
             return LocalSettings()
-        # Default to PRODUCTION
         return ProdSettings()
 
 
@@ -47,9 +44,13 @@ async def lifespan(app):
         yield
     finally:
         logger.info("Shutting down application...")
+        from app.persistence.vector.qdrant_repository import QdrantVectorRepository
+
         try:
-            pass
+            qdrant_repo = QdrantVectorRepository.get_instance()
+            await qdrant_repo.aclose()
         except Exception:
             pass
+
 
 settings: ApplicationSettings = get_settings()
