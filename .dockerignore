@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+.venv_x86/
+venv/
+env/
+ENV/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
+*.cover
+.hypothesis/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# Logs
+logs/
+*.log
+
+# Documentation
+*.md
+!README.md
+
+# Exports
+workflow_exports/
+
+# Scripts (except start.sh)
+scripts/
+!start.sh
+
+# Other
+lib/
+.env.example
+.env.*
+
