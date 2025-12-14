@@ -1,7 +1,9 @@
 from pydantic_settings import BaseSettings
 from typing import Dict, Any
 import decouple
-from app.core.config.settings.environments import Environment
+from app.core import Environment
+from ..database.vector_config import VectorDBSettings
+from .kavak_config import KavakSettings
 import pathlib
 
 ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.resolve()
@@ -9,8 +11,9 @@ ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.resolve()
 
 class ApplicationSettings(
     BaseSettings,
+    VectorDBSettings,
 ):
-
+    kavak: KavakSettings = KavakSettings()
 
     TITLE: str = "Kavak Agent API"
     VERSION: str = "1.0.0"
@@ -37,7 +40,6 @@ class ApplicationSettings(
     ALLOWED_HEADERS: list[str] = ["*"]
 
     LOGGERS: tuple[str, str] = ("uvicorn.asgi", "uvicorn.access")
-
 
     class Config:
         case_sensitive = True
