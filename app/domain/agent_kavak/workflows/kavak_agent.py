@@ -235,7 +235,6 @@ class KavakAgentWorkflow:
 
             response_text = str(response)
             response_text = response_text.strip()
-            verified_response = self._verify_response(response_text, query)
 
             if user_id:
                 asyncio.create_task(
@@ -243,7 +242,7 @@ class KavakAgentWorkflow:
                         ChatInteractionCreate(
                             user_id=str(user_id),
                             query=query,
-                            response=verified_response,
+                            response=response_text,
                         )
                     )
                 )
@@ -251,7 +250,7 @@ class KavakAgentWorkflow:
             logger.info("[AGENT] ReActAgent completed successfully")
 
             return {
-                "response": verified_response,
+                "response": response_text,
                 "user_id": user_id,
                 "agent": self.name,
                 "provider": self.llm_manager.settings.llm.PROVIDER,
@@ -263,33 +262,3 @@ class KavakAgentWorkflow:
                 f"[AGENT] Error processing query with ReActAgent: {exc}", exc_info=True
             )
             raise
-
-    def _verify_response(self, response: str, original_query: str) -> str:
-        if not response or len(response.strip()) < MIN_RESPONSE_LENGTH:
-            return "Lo siento, no pude generar una respuesta adecuada. ¿Podrías reformular tu pregunta?"
-
-        hallucination_indicators = [
-            "no tengo acceso a",
-            "no puedo acceder a",
-            "no tengo información sobre",
-        ]
-
-        response_lower = response.lower()
-        query_lower = original_query.lower()
-
-        if any(indicator in response_lower for indicator in hallucination_indicators):
-            if any(
-                word in query_lower
-                for word in ["kavak", "qué es", "quienes son", "información"]
-            ):
-                logger.warning(
-                    f"Response indicates lack of info for basic Kavak query: {original_query[:50]}"
-                )
-
-        spanish_words = ["el", "la", "de", "que", "y", "en", "un", "es", "para", "con"]
-        has_spanish = any(word in response_lower for word in spanish_words)
-
-        if not has_spanish and len(response) > 50:
-            logger.warning(f"Response might not be in Spanish: {response[:100]}")
-
-        return response
