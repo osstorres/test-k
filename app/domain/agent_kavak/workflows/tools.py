@@ -1,62 +1,14 @@
-from typing import Dict, Any, List, Optional, Set
+from typing import Dict, Any, List
 
 from app.core.config.logging import logger
 from app.repository.vector import QdrantVectorRepository, CollectionType
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.models.agent.schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
-from app.utils.normalize import find_closest_make, find_closest_model
 from app.domain.prompts import build_rag_value_prop_prompt
 
-FUZZY_MATCH_THRESHOLD = 70
 DEFAULT_TOP_K = 20
 DEFAULT_RAG_TOP_K = 5
-EMBEDDING_DIMENSION = 1536
 MAX_CATALOG_RESULTS_MULTIPLIER = 2
-
-_known_makes_cache: Optional[Set[str]] = None
-_known_models_cache: Optional[Set[str]] = None
-
-
-async def load_known_makes_models(
-    vector_repository: QdrantVectorRepository,
-) -> tuple[Set[str], Set[str]]:
-    global _known_makes_cache, _known_models_cache
-
-    if _known_makes_cache is not None and _known_models_cache is not None:
-        return _known_makes_cache, _known_models_cache
-
-    try:
-        dummy_embedding = [0.0] * EMBEDDING_DIMENSION
-
-        results = await vector_repository.search(
-            vector=dummy_embedding,
-            top_k=1000,
-            collection=CollectionType.KAVAK_CATALOG,
-        )
-
-        makes = set()
-        models = set()
-
-        for result in results:
-            payload = result.payload if hasattr(result, "payload") else {}
-            if make := payload.get("make"):
-                makes.add(str(make).strip())
-            if model := payload.get("model"):
-                models.add(str(model).strip())
-
-        _known_makes_cache = makes
-        _known_models_cache = models
-
-        logger.info(
-            f"Loaded {len(makes)} makes and {len(models)} models for fuzzy matching"
-        )
-        return makes, models
-
-    except Exception as exc:
-        logger.warning(f"Error loading known makes/models: {exc}, using empty sets")
-        _known_makes_cache = set()
-        _known_models_cache = set()
-        return _known_makes_cache, _known_models_cache
 
 
 async def rag_value_prop_tool(
@@ -136,48 +88,6 @@ async def search_catalog_tool(
     logger.info(f"Searching catalog with preferences: {preferences}")
 
     try:
-        normalized_prefs = preferences.model_dump(exclude_none=True)
-        make = normalized_prefs.get("brand")
-        model = normalized_prefs.get("model")
-
-        known_makes: Optional[Set[str]] = None
-        known_models: Optional[Set[str]] = None
-        if make or model:
-            try:
-                known_makes, known_models = await load_known_makes_models(
-                    vector_repository
-                )
-            except Exception as exc:
-                logger.warning(f"Error loading known makes/models: {exc}")
-
-        if make and known_makes:
-            try:
-                normalized_make = find_closest_make(
-                    make, known_makes, threshold=FUZZY_MATCH_THRESHOLD
-                )
-                if normalized_make:
-                    if normalized_make.lower() != make.lower():
-                        logger.info(f"Normalized make '{make}' to '{normalized_make}'")
-                    normalized_prefs["brand"] = normalized_make
-                    preferences.brand = normalized_make
-            except Exception as exc:
-                logger.warning(f"Error normalizing make: {exc}, using original")
-
-        if model and known_models:
-            try:
-                normalized_model = find_closest_model(
-                    model, known_models, threshold=FUZZY_MATCH_THRESHOLD
-                )
-                if normalized_model:
-                    if normalized_model.lower() != model.lower():
-                        logger.info(
-                            f"Normalized model '{model}' to '{normalized_model}'"
-                        )
-                    normalized_prefs["model"] = normalized_model
-                    preferences.model = normalized_model
-            except Exception as exc:
-                logger.warning(f"Error normalizing model: {exc}, using original")
-
         query_text = _build_catalog_query(preferences)
         embedding = await llm_manager.embed_text(query_text)
         filters = _build_qdrant_filters(preferences)
