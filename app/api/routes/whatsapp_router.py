@@ -34,7 +34,6 @@ async def whatsapp_webhook(
             ProfileName=ProfileName,
             NumMedia=NumMedia,
         )
-
         user_id = event.user_id
         message = event.message
         profile_name = event.ProfileName
