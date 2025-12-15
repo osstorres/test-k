@@ -17,7 +17,7 @@ from qdrant_client.models import (
     MatchAny,
 )
 from app.core.manager import settings
-from app.persistence.vector.collection_config import (
+from app.repository.vector.collection_config import (
     CollectionType,
     get_collection_config,
 )

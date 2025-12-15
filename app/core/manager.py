@@ -44,7 +44,7 @@ async def lifespan(app):
         yield
     finally:
         logger.info("Shutting down application...")
-        from app.persistence.vector.qdrant_repository import QdrantVectorRepository
+        from app.repository.vector import QdrantVectorRepository
 
         try:
             qdrant_repo = QdrantVectorRepository.get_instance()
