@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Dict, Any, List, Optional
 from app.core.config.logging import logger
 from app.core.config.settings.kavak_config import KavakSettings
+from mem0 import Memory
 
 
 class MemoryManager:
@@ -18,8 +19,6 @@ class MemoryManager:
             return
 
         try:
-            from mem0 import Memory
-
             kavak_settings = KavakSettings()
 
             embedding_model = kavak_settings.mem0.EMBEDDING_MODEL
@@ -64,11 +63,6 @@ class MemoryManager:
             self.memory = Memory.from_config(config)
             self._initialized = True
 
-            logger.info("Memory Manager initialized successfully")
-
-        except ImportError as exc:
-            logger.error("Mem0 library not installed. Install with: pip install mem0ai")
-            raise ImportError("Mem0 library is required for memory management") from exc
         except Exception as exc:
             logger.error(f"Failed to initialize Memory Manager: {exc}")
             raise
