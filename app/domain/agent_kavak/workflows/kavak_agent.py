@@ -27,7 +27,6 @@ from .tools import (
 DEFAULT_LLM_TEMPERATURE = 0.3
 DEFAULT_MAX_TOKENS = 1000
 MAX_AGENT_ITERATIONS = 5
-MIN_RESPONSE_LENGTH = 10
 
 
 class KavakAgentWorkflow:

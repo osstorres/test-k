@@ -2,15 +2,6 @@ from typing import Literal, Optional, List
 from pydantic import BaseModel, Field
 
 
-class UserIntent(BaseModel):
-    intent: Literal["value_prop", "recommend", "finance", "other"] = Field(
-        description="User intent: value_prop (questions about Kavak), recommend (car recommendations), finance (financing questions), other"
-    )
-    confidence: float = Field(
-        ge=0.0, le=1.0, description="Confidence score for intent classification"
-    )
-
-
 class CarPreferences(BaseModel):
     brand: Optional[str] = Field(None, description="Car brand (normalized)")
     model: Optional[str] = Field(None, description="Car model (normalized)")
@@ -74,33 +65,3 @@ class Car(BaseModel):
 class RAGAnswer(BaseModel):
     answer: str = Field(description="Answer text")
     sources: List[str] = Field(default_factory=list, description="Source citations")
-
-
-class BotReply(BaseModel):
-    message: str = Field(description="Response message to user")
-    recommended_car_ids: List[str] = Field(
-        default_factory=list,
-        description="IDs of recommended cars (must exist in catalog)",
-    )
-    financing: Optional[FinancingPlan] = Field(
-        None, description="Financing plan if applicable"
-    )
-    citations: List[str] = Field(
-        default_factory=list, description="Citations for value prop answers"
-    )
-
-
-class UserState(BaseModel):
-    user_id: str = Field(description="User ID")
-    name: Optional[str] = Field(None, description="User name")
-    city: Optional[str] = Field(None, description="User city")
-    intent_stage: Literal["exploring", "comparing", "financing_ready"] = Field(
-        default="exploring", description="Current intent stage"
-    )
-    preferences: Optional[CarPreferences] = Field(None, description="User preferences")
-    last_results: List[str] = Field(
-        default_factory=list, description="IDs of last recommended cars"
-    )
-    financing_context: Optional[dict] = Field(
-        None, description="Financing context (price, down_payment, term, rate)"
-    )
