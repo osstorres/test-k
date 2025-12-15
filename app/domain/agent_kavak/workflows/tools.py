@@ -5,6 +5,7 @@ from app.repository.vector import QdrantVectorRepository, CollectionType
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.models.agent.schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
 from app.utils.normalize import find_closest_make, find_closest_model
+from app.domain.prompts import build_rag_value_prop_prompt
 
 FUZZY_MATCH_THRESHOLD = 70
 DEFAULT_TOP_K = 20
@@ -104,21 +105,7 @@ async def rag_value_prop_tool(
 
         context = "\n\n".join(context_parts)
 
-        prompt = f"""Eres un asistente comercial de Kavak. Responde la pregunta del usuario usando SOLO la información proporcionada en el contexto.
-
-Contexto sobre Kavak:
-{context}
-
-Pregunta del usuario: {query}
-
-Instrucciones:
-- Responde de manera clara, concisa y amigable
-- Usa SOLO la información del contexto proporcionado
-- Si la información no está en el contexto, di que no tienes esa información específica
-- Responde en español mexicano
-- Sé profesional pero cercano, como un agente comercial real
-
-Respuesta:"""
+        prompt = build_rag_value_prop_prompt(query=query, context=context)
 
         answer = await llm_manager.complete_text(
             prompt=prompt,

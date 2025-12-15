@@ -14,6 +14,10 @@ from app.repository.vector import QdrantVectorRepository
 from app.repository.postgres.chat_context_repository import ChatContextRepository
 from app.models.agent.chat_interaction import ChatInteractionCreate
 from app.models.agent.schemas import CarPreferences
+from app.domain.prompts import (
+    AGENT_SYSTEM_PROMPT,
+    build_car_preferences_extraction_prompt,
+)
 from .tools import (
     rag_value_prop_tool,
     search_catalog_tool,
@@ -97,22 +101,9 @@ class KavakAgentWorkflow:
                 prefs = CarPreferences(**prefs_dict)
             except (json.JSONDecodeError, ValueError):
                 try:
-                    extraction_prompt = f"""Analiza este texto y extrae información sobre el auto mencionado: "{preferences}"
-
-IMPORTANTE: 
-- Si menciona una marca Y modelo (ej: "Toyota Corolla", "el Corolla", "toyota corolla", "corolla"), extrae AMBOS: brand y model.
-- Si solo menciona marca (ej: "Toyota"), extrae solo brand.
-- Si menciona año específico, extrae year_min y year_max con ese año.
-- Ignora preguntas sobre características (Bluetooth, CarPlay) - solo extrae marca, modelo, año.
-
-Extrae: marca (brand), modelo (model), año (year_min/year_max si se menciona).
-
-Ejemplos:
-- "el toyota corolla tiene bluetooth?" → brand: "Toyota", model: "Corolla"
-- "toyota corolla 2020" → brand: "Toyota", model: "Corolla", year_min: 2020, year_max: 2020
-- "corolla" → brand: "Toyota", model: "Corolla" (si puedes inferir la marca)
-
-Responde en formato JSON válido."""
+                    extraction_prompt = build_car_preferences_extraction_prompt(
+                        preferences
+                    )
 
                     prefs = await self.llm_manager.complete_structured_text(
                         prompt=extraction_prompt,
@@ -205,42 +196,7 @@ Responde en formato JSON válido."""
         return tools
 
     def _get_system_prompt(self) -> PromptTemplate:
-        prompt_str = """Eres un agente comercial de Kavak en México. Responde de forma directa y concisa.
-
-REGLAS CRÍTICAS:
-- Para preguntas sobre Kavak (sedes, servicios, garantías): usa rag_value_prop
-- Para CUALQUIER pregunta sobre un auto específico (marca, modelo) o sus características (Bluetooth, CarPlay, dimensiones): SIEMPRE usa search_catalog PRIMERO
-- Para financiamiento: usa compute_financing
-- NUNCA inventes información sobre características de autos. SIEMPRE busca en el catálogo.
-- Si el usuario pregunta "¿el X tiene Y?" o "X tiene bluetooth?", busca ese auto específico usando search_catalog y responde con la información encontrada.
-- Responde en español mexicano, máximo 2-3 párrafos
-
-EJEMPLOS DE CUANDO USAR search_catalog:
-- "el toyota corolla tiene bluetooth?" → Usa search_catalog con brand: "Toyota", model: "Corolla"
-- "corolla tiene carplay?" → Usa search_catalog con brand: "Toyota", model: "Corolla"
-- "qué autos toyota tienen?" → Usa search_catalog con brand: "Toyota"
-- "dimensiones del corolla" → Usa search_catalog con brand: "Toyota", model: "Corolla"
-
-## Tools
-
-You have access to the following tools:
-{tool_desc}
-
-## Output Format
-
-Thought: (breve análisis)
-Action: tool name (one of {tool_names})
-Action Input: JSON con parámetros
-
-O cuando tengas la respuesta:
-Thought: Tengo suficiente información
-Answer: [respuesta en español mexicano, concisa]
-
-IMPORTANTE: 
-- Sé directo. Usa máximo 3 iteraciones.
-- Si la pregunta menciona una marca/modelo o pregunta sobre características, SIEMPRE usa search_catalog primero.
-- Si la pregunta es simple (ej: "sedes en Monterrey"), usa UNA herramienta y responde."""
-        return PromptTemplate(prompt_str)
+        return PromptTemplate(AGENT_SYSTEM_PROMPT)
 
     async def process_query(
         self,
