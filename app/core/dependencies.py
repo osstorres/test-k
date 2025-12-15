@@ -3,6 +3,7 @@ from fastapi import Depends
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.core.services.memory_manager import get_memory_manager, MemoryManager
 from app.persistence.vector.qdrant_repository import QdrantVectorRepository
+from app.domain.agent_kavak.facade import KavakAgentFacade
 from app.core.config.logging import logger
 
 
@@ -31,3 +32,18 @@ def get_kavak_llm_manager() -> KavakLLMManager:
 KavakLLMDep = Annotated[KavakLLMManager, Depends(get_kavak_llm_manager)]
 QdrantRepoDep = Annotated[QdrantVectorRepository, Depends(get_qdrant_repository)]
 MemoryManagerDep = Annotated[MemoryManager, Depends(get_memory_manager)]
+
+
+async def get_kavak_facade(
+    llm_manager: KavakLLMDep,
+    vector_repository: QdrantRepoDep,
+    memory_manager: MemoryManagerDep,
+) -> KavakAgentFacade:
+    return KavakAgentFacade(
+        llm_manager=llm_manager,
+        vector_repository=vector_repository,
+        memory_manager=memory_manager,
+    )
+
+
+KavakFacadeDep = Annotated[KavakAgentFacade, Depends(get_kavak_facade)]

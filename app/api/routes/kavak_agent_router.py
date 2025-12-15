@@ -1,38 +1,11 @@
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException
 
 from app.core.config.logging import logger
-from app.core.dependencies import KavakLLMDep, QdrantRepoDep, MemoryManagerDep
-from app.domain.agent_kavak.facade import KavakAgentFacade
+from app.core.dependencies import KavakFacadeDep
+from app.models.api_schemas import KavakQueryRequest, KavakQueryResponse
 
 
 router = APIRouter(prefix="/kavak", tags=["kavak-agent"])
-
-
-class KavakQueryRequest(BaseModel):
-    query: str = Field(..., description="User query/message")
-    user_id: Optional[str] = Field(None, description="User ID for memory context")
-
-
-class KavakQueryResponse(BaseModel):
-    response: str = Field(..., description="Agent response message")
-    user_id: Optional[str] = Field(None, description="User ID")
-    agent: str = Field(..., description="Agent name")
-    provider: str = Field(..., description="LLM provider used")
-    model: str = Field(..., description="LLM model used")
-
-
-async def get_kavak_facade(
-    llm_manager: KavakLLMDep,
-    vector_repository: QdrantRepoDep,
-    memory_manager: MemoryManagerDep,
-) -> KavakAgentFacade:
-    return KavakAgentFacade(
-        llm_manager=llm_manager,
-        vector_repository=vector_repository,
-        memory_manager=memory_manager,
-    )
 
 
 @router.post(
@@ -43,7 +16,7 @@ async def get_kavak_facade(
 )
 async def process_kavak_chat(
     request: KavakQueryRequest,
-    facade: KavakAgentFacade = Depends(get_kavak_facade),
+    facade: KavakFacadeDep,
 ) -> KavakQueryResponse:
     try:
         logger.info(f"Processing Kavak chat query for user: {request.user_id}")

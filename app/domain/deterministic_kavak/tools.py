@@ -183,11 +183,6 @@ async def _retrieve_value_prop_optimized(
     llm_manager: KavakLLMManager,
     top_k: int = 3,
 ) -> List[Dict[str, Any]]:
-    """
-    Optimized value prop retrieval with smaller chunks (already done in loader).
-
-    Returns top_k chunks (optimized: 2-5, default 3).
-    """
     try:
         embedding = await llm_manager.embed_text(query)
 
@@ -221,7 +216,6 @@ async def _retrieve_value_prop_optimized(
 
 
 def _build_qdrant_filters_optimized(preferences_dict: Dict[str, Any]) -> Dict[str, Any]:
-    """Build Qdrant filters from preferences (hard constraints first)."""
     filters = {}
 
     if budget_max := preferences_dict.get("budget_max"):

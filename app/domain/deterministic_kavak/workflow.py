@@ -11,7 +11,8 @@ from app.domain.agent_kavak.workflows.schemas import (
     CarPreferences,
 )
 import re
-from .tools import compute_financing_tool, retrieve_context
+from .tools import retrieve_context
+
 from .events import RoutingEvent
 
 
@@ -472,6 +473,7 @@ Si hay un precio mencionado, responde SOLO con el número. Si no hay precio, res
                 years = 3
             elif years > 6:
                 years = 6
+            from app.domain.agent_kavak.workflows.tools import compute_financing_tool
 
             interest_rate = 0.10
             plan = await compute_financing_tool(

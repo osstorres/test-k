@@ -1,45 +1,13 @@
-from dataclasses import dataclass
 from typing import Optional
-from fastapi import APIRouter, Form, Depends, Response
+from fastapi import APIRouter, Form, Response
 from twilio.twiml.messaging_response import MessagingResponse
 
 from app.core.config.logging import logger
-from app.core.dependencies import KavakLLMDep, QdrantRepoDep, MemoryManagerDep
-from app.domain.agent_kavak.facade import KavakAgentFacade
+from app.core.dependencies import KavakFacadeDep
+from app.models.api_schemas import TwilioWebhookEvent
 
 
 router = APIRouter(prefix="/whatsapp", tags=["whatsapp"])
-
-
-@dataclass
-class TwilioWebhookEvent:
-    MessageSid: str
-    AccountSid: str
-    From: str
-    To: str
-    Body: str
-    ProfileName: Optional[str] = None
-    NumMedia: str = "0"
-
-    @property
-    def user_id(self) -> str:
-        return self.From.replace("whatsapp:", "")
-
-    @property
-    def message(self) -> str:
-        return self.Body.strip()
-
-
-async def get_kavak_facade(
-    llm_manager: KavakLLMDep,
-    vector_repository: QdrantRepoDep,
-    memory_manager: MemoryManagerDep,
-) -> KavakAgentFacade:
-    return KavakAgentFacade(
-        llm_manager=llm_manager,
-        vector_repository=vector_repository,
-        memory_manager=memory_manager,
-    )
 
 
 @router.post(
@@ -48,7 +16,7 @@ async def get_kavak_facade(
     description="Receives incoming WhatsApp messages from Twilio and processes them with Kavak agent.",
 )
 async def whatsapp_webhook(
-    facade: KavakAgentFacade = Depends(get_kavak_facade),
+    facade: KavakFacadeDep,
     MessageSid: str = Form(...),
     AccountSid: str = Form(...),
     From: str = Form(...),
