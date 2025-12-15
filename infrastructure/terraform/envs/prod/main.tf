@@ -87,6 +87,7 @@ module "test-k" {
 
   existing_security_group_id = aws_security_group.app_runner_vpc.id
 
+  custom_domain_name = "test.elosos.xyz"
   environment_variables = {
 
   }
