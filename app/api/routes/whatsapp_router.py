@@ -8,7 +8,7 @@ from app.core.dependencies import KavakFacadeDep
 from app.models.api.api_schemas import TwilioWebhookEvent
 
 
-router = APIRouter(prefix="/whatsapp", tags=["whatsapp"])
+router = APIRouter(prefix="/mD0UNo976r64HlxkUQbLpp", tags=["whatsapp"])
 
 
 @router.post(
