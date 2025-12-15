@@ -1,4 +1,7 @@
-from typing import Dict, Any, Optional, List
+import asyncio
+import json
+from typing import Dict, Any, Optional, List, Tuple
+
 from llama_index.core.agent.workflow import ReActAgent
 from llama_index.core.workflow import Context
 from llama_index.core.tools import FunctionTool
@@ -10,8 +13,10 @@ from app.core.services.memory_manager import MemoryManager
 from app.repository.vector import QdrantVectorRepository
 from app.repository.postgres.chat_context_repository import ChatContextRepository
 from app.models.agent.chat_interaction import ChatInteractionCreate
-from app.models.agent.schemas import (
-    CarPreferences,
+from app.models.agent.schemas import CarPreferences
+from app.domain.prompts import (
+    AGENT_SYSTEM_PROMPT,
+    build_car_preferences_extraction_prompt,
 )
 from .tools import (
     rag_value_prop_tool,
@@ -19,7 +24,11 @@ from .tools import (
     compute_financing_tool,
 )
 
-import json
+DEFAULT_LLM_TEMPERATURE = 0.3
+DEFAULT_MAX_TOKENS = 1000
+MAX_AGENT_ITERATIONS = 5
+MIN_RESPONSE_LENGTH = 10
+FUZZY_MATCH_THRESHOLD = 70
 
 
 class KavakAgentWorkflow:
@@ -45,7 +54,7 @@ class KavakAgentWorkflow:
 
         self.tools = self._create_tools()
         self.llm = self.llm_manager.get_llama_index_llm(
-            temperature=0.3, max_tokens=1000
+            temperature=DEFAULT_LLM_TEMPERATURE, max_tokens=DEFAULT_MAX_TOKENS
         )
 
         self._user_agents: Dict[str, ReActAgent] = {}
@@ -53,30 +62,25 @@ class KavakAgentWorkflow:
 
         logger.info(f"Initialized {self.name} agent with ReActAgent")
 
+    def _create_agent(self) -> ReActAgent:
+        agent = ReActAgent(
+            tools=self.tools,
+            llm=self.llm,
+            max_iterations=MAX_AGENT_ITERATIONS,
+            verbose=False,
+        )
+        agent.update_prompts({"react_header": self._get_system_prompt()})
+        return agent
+
     def _get_user_agent_and_context(
         self, user_id: Optional[str]
-    ) -> tuple[ReActAgent, Context]:
+    ) -> Tuple[ReActAgent, Context]:
         if not user_id:
-            agent = ReActAgent(
-                tools=self.tools,
-                llm=self.llm,
-                max_iterations=5,
-                verbose=False,
-            )
-            agent.update_prompts({"react_header": self._get_system_prompt()})
-            ctx = Context(agent)
-            return agent, ctx
+            agent = self._create_agent()
+            return agent, Context(agent)
 
         if user_id not in self._user_agents:
-            self._user_agents[user_id] = ReActAgent(
-                tools=self.tools,
-                llm=self.llm,
-                max_iterations=5,
-                verbose=False,
-            )
-            self._user_agents[user_id].update_prompts(
-                {"react_header": self._get_system_prompt()}
-            )
+            self._user_agents[user_id] = self._create_agent()
             self._user_contexts[user_id] = Context(self._user_agents[user_id])
             logger.info(f"Created ReActAgent for user: {user_id}")
 
@@ -97,22 +101,9 @@ class KavakAgentWorkflow:
                 prefs = CarPreferences(**prefs_dict)
             except (json.JSONDecodeError, ValueError):
                 try:
-                    extraction_prompt = f"""Analiza este texto y extrae información sobre el auto mencionado: "{preferences}"
-
-IMPORTANTE: 
-- Si menciona una marca Y modelo (ej: "Toyota Corolla", "el Corolla", "toyota corolla", "corolla"), extrae AMBOS: brand y model.
-- Si solo menciona marca (ej: "Toyota"), extrae solo brand.
-- Si menciona año específico, extrae year_min y year_max con ese año.
-- Ignora preguntas sobre características (Bluetooth, CarPlay) - solo extrae marca, modelo, año.
-
-Extrae: marca (brand), modelo (model), año (year_min/year_max si se menciona).
-
-Ejemplos:
-- "el toyota corolla tiene bluetooth?" → brand: "Toyota", model: "Corolla"
-- "toyota corolla 2020" → brand: "Toyota", model: "Corolla", year_min: 2020, year_max: 2020
-- "corolla" → brand: "Toyota", model: "Corolla" (si puedes inferir la marca)
-
-Responde en formato JSON válido."""
+                    extraction_prompt = build_car_preferences_extraction_prompt(
+                        preferences
+                    )
 
                     prefs = await self.llm_manager.complete_structured_text(
                         prompt=extraction_prompt,
@@ -205,42 +196,7 @@ Responde en formato JSON válido."""
         return tools
 
     def _get_system_prompt(self) -> PromptTemplate:
-        prompt_str = """Eres un agente comercial de Kavak en México. Responde de forma directa y concisa.
-
-REGLAS CRÍTICAS:
-- Para preguntas sobre Kavak (sedes, servicios, garantías): usa rag_value_prop
-- Para CUALQUIER pregunta sobre un auto específico (marca, modelo) o sus características (Bluetooth, CarPlay, dimensiones): SIEMPRE usa search_catalog PRIMERO
-- Para financiamiento: usa compute_financing
-- NUNCA inventes información sobre características de autos. SIEMPRE busca en el catálogo.
-- Si el usuario pregunta "¿el X tiene Y?" o "X tiene bluetooth?", busca ese auto específico usando search_catalog y responde con la información encontrada.
-- Responde en español mexicano, máximo 2-3 párrafos
-
-EJEMPLOS DE CUANDO USAR search_catalog:
-- "el toyota corolla tiene bluetooth?" → Usa search_catalog con brand: "Toyota", model: "Corolla"
-- "corolla tiene carplay?" → Usa search_catalog con brand: "Toyota", model: "Corolla"
-- "qué autos toyota tienen?" → Usa search_catalog con brand: "Toyota"
-- "dimensiones del corolla" → Usa search_catalog con brand: "Toyota", model: "Corolla"
-
-## Tools
-
-You have access to the following tools:
-{tool_desc}
-
-## Output Format
-
-Thought: (breve análisis)
-Action: tool name (one of {tool_names})
-Action Input: JSON con parámetros
-
-O cuando tengas la respuesta:
-Thought: Tengo suficiente información
-Answer: [respuesta en español mexicano, concisa]
-
-IMPORTANTE: 
-- Sé directo. Usa máximo 3 iteraciones.
-- Si la pregunta menciona una marca/modelo o pregunta sobre características, SIEMPRE usa search_catalog primero.
-- Si la pregunta es simple (ej: "sedes en Monterrey"), usa UNA herramienta y responde."""
-        return PromptTemplate(prompt_str)
+        return PromptTemplate(AGENT_SYSTEM_PROMPT)
 
     async def process_query(
         self,
@@ -252,8 +208,6 @@ IMPORTANTE:
             logger.info("[AGENT] Processing query with ReActAgent")
             logger.info(f"User ID: {user_id}")
             logger.info("Architecture: Agent-based (automatic tool selection)")
-
-            import asyncio
 
             if user_id:
                 await self.chat_context_repository.initialize()
@@ -311,7 +265,7 @@ IMPORTANTE:
             raise
 
     def _verify_response(self, response: str, original_query: str) -> str:
-        if not response or len(response.strip()) < 10:
+        if not response or len(response.strip()) < MIN_RESPONSE_LENGTH:
             return "Lo siento, no pude generar una respuesta adecuada. ¿Podrías reformular tu pregunta?"
 
         hallucination_indicators = [
@@ -339,6 +293,3 @@ IMPORTANTE:
             logger.warning(f"Response might not be in Spanish: {response[:100]}")
 
         return response
-
-
-KavakAgent = KavakAgentWorkflow

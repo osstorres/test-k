@@ -1,19 +1,28 @@
 from typing import Annotated
+
 from fastapi import Depends
+
+from app.core.config.logging import logger
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.core.services.memory_manager import get_memory_manager, MemoryManager
-from app.repository.vector.qdrant_repository import QdrantVectorRepository
 from app.domain.agent_kavak.facade import KavakAgentFacade
-from app.core.config.logging import logger
+from app.repository.vector import QdrantVectorRepository
 
 
 def get_qdrant_repository() -> QdrantVectorRepository:
     try:
         return QdrantVectorRepository.get_instance()
-    except Exception as exc:
+    except RuntimeError as exc:
         logger.error(
             "Failed to initialize QdrantVectorRepository",
             extra={"extra_fields": {"error": str(exc)}},
+        )
+        raise
+    except Exception as exc:
+        logger.error(
+            "Unexpected error initializing QdrantVectorRepository",
+            extra={"extra_fields": {"error": str(exc)}},
+            exc_info=True,
         )
         raise
 
@@ -21,10 +30,17 @@ def get_qdrant_repository() -> QdrantVectorRepository:
 def get_kavak_llm_manager() -> KavakLLMManager:
     try:
         return KavakLLMManager.get_instance()
-    except Exception as exc:
+    except RuntimeError as exc:
         logger.error(
             "Failed to initialize KavakLLMManager",
             extra={"extra_fields": {"error": str(exc)}},
+        )
+        raise
+    except Exception as exc:
+        logger.error(
+            "Unexpected error initializing KavakLLMManager",
+            extra={"extra_fields": {"error": str(exc)}},
+            exc_info=True,
         )
         raise
 
