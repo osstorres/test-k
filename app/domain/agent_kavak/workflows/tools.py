@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 from app.core.config.logging import logger
 from app.repository.vector import QdrantVectorRepository, CollectionType
 from app.core.services.kavak_llm_manager import KavakLLMManager
+from app.core.services.cag_manager import get_cag_manager
 from app.models.agent.schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
 from app.domain.prompts import build_rag_value_prop_prompt
 
@@ -16,12 +17,20 @@ async def rag_value_prop_tool(
     vector_repository: QdrantVectorRepository,
     llm_manager: KavakLLMManager,
     top_k: int = DEFAULT_RAG_TOP_K,
+    use_cag: bool = True,
 ) -> RAGAnswer:
     logger.info("Generating RAG answer")
 
     try:
-        embedding = await llm_manager.embed_text(query)
+        if use_cag:
+            cag_manager = get_cag_manager()
+            cached_response = await cag_manager.get_cached_response(
+                cache_type="value_prop", query=query
+            )
+            if cached_response:
+                return cached_response
 
+        embedding = await llm_manager.embed_text(query)
         results = await vector_repository.search(
             vector=embedding,
             top_k=top_k,
@@ -69,7 +78,20 @@ async def rag_value_prop_tool(
         if answer.startswith("Respuesta:"):
             answer = answer.replace("Respuesta:", "").strip()
 
-        return RAGAnswer(answer=answer, sources=sources)
+        response = RAGAnswer(answer=answer, sources=sources)
+
+        if use_cag:
+            try:
+                cag_manager = get_cag_manager()
+                await cag_manager.cache_response(
+                    cache_type="value_prop",
+                    query=query,
+                    response=response,
+                )
+            except Exception as cache_exc:
+                logger.warning(f"Failed to cache response (non-fatal): {cache_exc}")
+
+        return response
 
     except Exception as exc:
         logger.error(f"Error in rag_value_prop_tool: {exc}", exc_info=True)
