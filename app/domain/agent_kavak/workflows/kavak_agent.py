@@ -8,7 +8,7 @@ from app.core.config.logging import logger
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.core.services.memory_manager import MemoryManager
 from app.persistence.vector.qdrant_repository import QdrantVectorRepository
-from app.persistence.chat_context_repository import ChatContextRepository
+from app.persistence.postgres.chat_context_repository import ChatContextRepository
 from app.models.chat_interaction import ChatInteractionCreate
 from .schemas import (
     CarPreferences,
