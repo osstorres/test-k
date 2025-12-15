@@ -4,16 +4,16 @@ from typing import Optional, Dict, Any
 
 
 class ChatInteraction(BaseModel):
-    id: Optional[int] = Field(None, description="ID de la interacción")
-    user_id: str = Field(..., description="Identificador único del usuario")
-    session_id: Optional[str] = Field(None, description="ID de sesión de chat")
-    query: str = Field(..., description="Consulta o mensaje del usuario")
-    response: str = Field(..., description="Respuesta del asistente")
+    id: Optional[int] = Field(None, description="Interaction ID")
+    user_id: str = Field(..., description="Unique user identifier")
+    session_id: Optional[str] = Field(None, description="Chat session ID")
+    query: str = Field(..., description="User query or message")
+    response: str = Field(..., description="Assistant response")
     intent: Optional[str] = Field(
-        None, description="Intención detectada (valueprop, catalog, financing, other)"
+        None, description="Detected intent (valueprop, catalog, financing, other)"
     )
-    metadata: Optional[Dict[str, Any]] = Field(None, description="Metadata adicional")
-    created_at: Optional[datetime] = Field(None, description="Timestamp de creación")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
+    created_at: Optional[datetime] = Field(None, description="Creation timestamp")
 
     class Config:
         from_attributes = True
@@ -21,27 +21,27 @@ class ChatInteraction(BaseModel):
 
 
 class ChatInteractionCreate(BaseModel):
-    user_id: str = Field(..., description="Identificador único del usuario")
-    session_id: Optional[str] = Field(None, description="ID de sesión de chat")
-    query: str = Field(..., description="Consulta o mensaje del usuario")
-    response: str = Field(..., description="Respuesta del asistente")
-    intent: Optional[str] = Field(None, description="Intención detectada")
-    metadata: Optional[Dict[str, Any]] = Field(None, description="Metadata adicional")
+    user_id: str = Field(..., description="Unique user identifier")
+    session_id: Optional[str] = Field(None, description="Chat session ID")
+    query: str = Field(..., description="User query or message")
+    response: str = Field(..., description="Assistant response")
+    intent: Optional[str] = Field(None, description="Detected intent")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
 
 
 class ChatContext(BaseModel):
-    user_id: str = Field(..., description="Identificador único del usuario")
+    user_id: str = Field(..., description="Unique user identifier")
     interactions: list[ChatInteraction] = Field(
-        default_factory=list, description="Lista de interacciones"
+        default_factory=list, description="List of interactions"
     )
 
     def to_context_string(self) -> str:
         if not self.interactions:
             return ""
 
-        context_parts = ["## Contexto de Conversaciones Previas\n"]
+        context_parts = ["## Previous Conversation Context\n"]
         for i, interaction in enumerate(self.interactions, 1):
-            context_parts.append(f"{i}. Usuario: {interaction.query}")
-            context_parts.append(f"   Asistente: {interaction.response}")
+            context_parts.append(f"{i}. User: {interaction.query}")
+            context_parts.append(f"   Assistant: {interaction.response}")
 
         return "\n".join(context_parts)
