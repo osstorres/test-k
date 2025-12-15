@@ -157,22 +157,3 @@ class ChatContextRepository:
     async def get_chat_context(self, user_id: str) -> ChatContext:
         interactions = await self.get_last_interactions(user_id, limit=5)
         return ChatContext(user_id=user_id, interactions=interactions)
-
-    async def delete_user_interactions(self, user_id: str) -> int:
-        await self.initialize()
-
-        async with self.session_factory() as session:
-            try:
-                stmt = delete(ChatContextModel).where(
-                    ChatContextModel.user_id == user_id
-                )
-                result = await session.execute(stmt)
-                await session.commit()
-                return result.rowcount
-            except Exception as exc:
-                await session.rollback()
-                logger.error(
-                    f"Failed to delete interactions for user {user_id}: {exc}",
-                    exc_info=True,
-                )
-                return 0
