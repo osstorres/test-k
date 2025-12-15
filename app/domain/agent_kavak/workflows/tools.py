@@ -1,11 +1,56 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Set
 from app.core.config.logging import logger
 from app.persistence.vector.qdrant_repository import QdrantVectorRepository
 from app.persistence.vector.collection_config import CollectionType
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from .schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
 from app.utils.normalize import find_closest_make, find_closest_model
-from app.domain.deterministic_kavak.tools import load_known_makes_models
+
+_known_makes_cache: Optional[Set[str]] = None
+_known_models_cache: Optional[Set[str]] = None
+
+
+async def load_known_makes_models(
+    vector_repository: QdrantVectorRepository,
+) -> tuple[Set[str], Set[str]]:
+    """Load known makes and models from the catalog for fuzzy matching."""
+    global _known_makes_cache, _known_models_cache
+
+    if _known_makes_cache is not None and _known_models_cache is not None:
+        return _known_makes_cache, _known_models_cache
+
+    try:
+        dummy_embedding = [0.0] * 1536
+
+        results = await vector_repository.search(
+            vector=dummy_embedding,
+            top_k=1000,
+            collection=CollectionType.KAVAK_CATALOG,
+        )
+
+        makes = set()
+        models = set()
+
+        for result in results:
+            payload = result.payload if hasattr(result, "payload") else {}
+            if make := payload.get("make"):
+                makes.add(str(make).strip())
+            if model := payload.get("model"):
+                models.add(str(model).strip())
+
+        _known_makes_cache = makes
+        _known_models_cache = models
+
+        logger.info(
+            f"Loaded {len(makes)} makes and {len(models)} models for fuzzy matching"
+        )
+        return makes, models
+
+    except Exception as exc:
+        logger.warning(f"Error loading known makes/models: {exc}, using empty sets")
+        _known_makes_cache = set()
+        _known_models_cache = set()
+        return _known_makes_cache, _known_models_cache
 
 
 async def rag_value_prop_tool(
