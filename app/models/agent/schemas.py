@@ -25,6 +25,19 @@ class CarPreferences(BaseModel):
     )
     city: Optional[str] = Field(None, description="City/location preference")
     mileage_max: Optional[int] = Field(None, ge=0, description="Maximum mileage in km")
+    order_by: Optional[
+        Literal[
+            "mileage_asc",
+            "mileage_desc",
+            "price_asc",
+            "price_desc",
+            "year_desc",
+            "year_asc",
+        ]
+    ] = Field(
+        None,
+        description="Order results by: mileage_asc (menor kilometraje), mileage_desc (mayor kilometraje), price_asc (más barato), price_desc (más caro), year_desc (más nuevo), year_asc (más viejo)",
+    )
 
 
 class FinancingPlan(BaseModel):

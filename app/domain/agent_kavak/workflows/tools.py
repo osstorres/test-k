@@ -182,9 +182,16 @@ async def search_catalog_tool(
         embedding = await llm_manager.embed_text(query_text)
         filters = _build_qdrant_filters(preferences)
 
+        search_top_k = top_k * MAX_CATALOG_RESULTS_MULTIPLIER
+        if preferences.order_by:
+            search_top_k = max(search_top_k * 3, 100)
+            logger.info(
+                f"Comparative query detected (order_by={preferences.order_by}), increasing search top_k to {search_top_k}"
+            )
+
         results = await vector_repository.search(
             vector=embedding,
-            top_k=top_k * MAX_CATALOG_RESULTS_MULTIPLIER,
+            top_k=search_top_k,
             filter_by=filters if filters else None,
             collection=CollectionType.KAVAK_CATALOG,
         )
@@ -347,6 +354,20 @@ def _build_catalog_query(preferences: CarPreferences) -> str:
     if preferences.mileage_max:
         parts.append(f"kilometraje bajo hasta {preferences.mileage_max} km")
 
+    if preferences.order_by:
+        if preferences.order_by == "mileage_asc":
+            parts.append("menor kilometraje mínimo")
+        elif preferences.order_by == "mileage_desc":
+            parts.append("mayor kilometraje máximo")
+        elif preferences.order_by == "price_asc":
+            parts.append("más barato precio menor")
+        elif preferences.order_by == "price_desc":
+            parts.append("más caro precio mayor")
+        elif preferences.order_by == "year_desc":
+            parts.append("más nuevo año reciente")
+        elif preferences.order_by == "year_asc":
+            parts.append("más viejo año antiguo")
+
     if parts:
         query = "auto " + " ".join(parts)
     else:
@@ -399,31 +420,52 @@ def _rerank_and_convert(results: List[Any], preferences: CarPreferences) -> List
             if not stock_id or not make or not model or not year or not price:
                 continue
 
-            rerank_score = score
+            if preferences.order_by:
+                if preferences.order_by == "mileage_asc":
+                    sort_key = km if km is not None else float("inf")
+                elif preferences.order_by == "mileage_desc":
+                    sort_key = km if km is not None else float("-inf")
+                elif preferences.order_by == "price_asc":
+                    sort_key = price if price is not None else float("inf")
+                elif preferences.order_by == "price_desc":
+                    sort_key = price if price is not None else float("-inf")
+                elif preferences.order_by == "year_desc":
+                    sort_key = year if year is not None else float("-inf")
+                elif preferences.order_by == "year_asc":
+                    sort_key = year if year is not None else float("inf")
+                else:
+                    sort_key = score
 
-            if preferences.brand and make.lower() == preferences.brand.lower():
-                rerank_score += 0.2
+                rerank_score = sort_key
+                logger.debug(
+                    f"Using order_by={preferences.order_by}, sort_key={sort_key} for car {stock_id}"
+                )
+            else:
+                rerank_score = score
 
-            if preferences.model and model.lower() == preferences.model.lower():
-                rerank_score += 0.2
+                if preferences.brand and make.lower() == preferences.brand.lower():
+                    rerank_score += 0.2
 
-            if preferences.budget_max and price:
-                budget_ratio = price / float(preferences.budget_max)
-                if budget_ratio <= 1.0:
-                    if 0.7 <= budget_ratio <= 0.95:
-                        rerank_score += 0.15
-                    elif budget_ratio > 0.95:
-                        rerank_score += 0.1
-                    else:
-                        rerank_score += 0.05
+                if preferences.model and model.lower() == preferences.model.lower():
+                    rerank_score += 0.2
 
-            if year:
-                year_score = (year - 2000) / 24.0
-                rerank_score += year_score * 0.1
+                if preferences.budget_max and price:
+                    budget_ratio = price / float(preferences.budget_max)
+                    if budget_ratio <= 1.0:
+                        if 0.7 <= budget_ratio <= 0.95:
+                            rerank_score += 0.15
+                        elif budget_ratio > 0.95:
+                            rerank_score += 0.1
+                        else:
+                            rerank_score += 0.05
 
-            if km:
-                mileage_score = 1.0 - min(km / 200000.0, 1.0)
-                rerank_score += mileage_score * 0.1
+                if year:
+                    year_score = (year - 2000) / 24.0
+                    rerank_score += year_score * 0.1
+
+                if km:
+                    mileage_score = 1.0 - min(km / 200000.0, 1.0)
+                    rerank_score += mileage_score * 0.1
 
             bluetooth = payload.get("bluetooth", False)
             car_play = payload.get("car_play", False)
@@ -457,5 +499,11 @@ def _rerank_and_convert(results: List[Any], preferences: CarPreferences) -> List
             logger.warning(f"Error processing car result: {exc}, payload: {payload}")
             continue
 
-    cars_with_scores.sort(key=lambda x: x[0], reverse=True)
+    if preferences.order_by and preferences.order_by.endswith("_asc"):
+        cars_with_scores.sort(key=lambda x: x[0])
+    elif preferences.order_by and preferences.order_by.endswith("_desc"):
+        cars_with_scores.sort(key=lambda x: x[0], reverse=True)
+    else:
+        cars_with_scores.sort(key=lambda x: x[0], reverse=True)
+
     return [car for _, car in cars_with_scores]
