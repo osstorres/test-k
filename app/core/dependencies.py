@@ -10,7 +10,6 @@ from app.repository.vector import QdrantVectorRepository
 
 
 def get_qdrant_repository() -> QdrantVectorRepository:
-    """Get or create QdrantVectorRepository singleton instance."""
     try:
         return QdrantVectorRepository.get_instance()
     except RuntimeError as exc:
@@ -29,7 +28,6 @@ def get_qdrant_repository() -> QdrantVectorRepository:
 
 
 def get_kavak_llm_manager() -> KavakLLMManager:
-    """Get or create KavakLLMManager singleton instance."""
     try:
         return KavakLLMManager.get_instance()
     except RuntimeError as exc:

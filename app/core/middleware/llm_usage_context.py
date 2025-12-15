@@ -60,10 +60,8 @@ class LLMUsageContext:
 
 
 def set_current_llm_usage_context(context: LLMUsageContext):
-    """Store context so other modules can fetch usage metrics."""
     return llm_usage_context_var.set(context)
 
 
 def get_current_llm_usage_context() -> LLMUsageContext | None:
-    """Retrieve the usage context attached to the current request."""
     return llm_usage_context_var.get()

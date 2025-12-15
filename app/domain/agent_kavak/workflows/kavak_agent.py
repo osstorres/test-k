@@ -20,7 +20,6 @@ from .tools import (
     compute_financing_tool,
 )
 
-# Constants
 DEFAULT_LLM_TEMPERATURE = 0.3
 DEFAULT_MAX_TOKENS = 1000
 MAX_AGENT_ITERATIONS = 5
@@ -60,7 +59,6 @@ class KavakAgentWorkflow:
         logger.info(f"Initialized {self.name} agent with ReActAgent")
 
     def _create_agent(self) -> ReActAgent:
-        """Create a new ReActAgent instance with configured tools and prompts."""
         agent = ReActAgent(
             tools=self.tools,
             llm=self.llm,
@@ -73,7 +71,6 @@ class KavakAgentWorkflow:
     def _get_user_agent_and_context(
         self, user_id: Optional[str]
     ) -> Tuple[ReActAgent, Context]:
-        """Get or create agent and context for a user."""
         if not user_id:
             agent = self._create_agent()
             return agent, Context(agent)

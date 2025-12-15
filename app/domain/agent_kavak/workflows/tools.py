@@ -6,14 +6,12 @@ from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.models.agent.schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
 from app.utils.normalize import find_closest_make, find_closest_model
 
-# Constants
 FUZZY_MATCH_THRESHOLD = 70
 DEFAULT_TOP_K = 20
 DEFAULT_RAG_TOP_K = 5
 EMBEDDING_DIMENSION = 1536
 MAX_CATALOG_RESULTS_MULTIPLIER = 2
 
-# Cache for known makes and models
 _known_makes_cache: Optional[Set[str]] = None
 _known_models_cache: Optional[Set[str]] = None
 
@@ -21,7 +19,6 @@ _known_models_cache: Optional[Set[str]] = None
 async def load_known_makes_models(
     vector_repository: QdrantVectorRepository,
 ) -> tuple[Set[str], Set[str]]:
-    """Load known makes and models from the catalog for fuzzy matching."""
     global _known_makes_cache, _known_models_cache
 
     if _known_makes_cache is not None and _known_models_cache is not None:
@@ -156,7 +153,6 @@ async def search_catalog_tool(
         make = normalized_prefs.get("brand")
         model = normalized_prefs.get("model")
 
-        # Load known makes/models once if needed for normalization
         known_makes: Optional[Set[str]] = None
         known_models: Optional[Set[str]] = None
         if make or model:
@@ -373,7 +369,6 @@ def _build_catalog_query(preferences: CarPreferences) -> str:
 
 
 def _build_qdrant_filters(preferences: CarPreferences) -> Dict[str, Any]:
-    """Build Qdrant filters from preferences for hard constraints."""
     filters = {}
 
     if preferences.budget_max:
