@@ -1,4 +1,5 @@
 from typing import Optional
+import asyncio
 from fastapi import APIRouter, Form, Response
 from twilio.twiml.messaging_response import MessagingResponse
 
@@ -65,6 +66,16 @@ async def whatsapp_webhook(
         twiml_response = MessagingResponse()
         twiml_response.message(agent_response)
         twiml_xml = str(twiml_response)
+
+        if facade.memory_manager and user_id:
+            asyncio.create_task(
+                facade.memory_manager.add_conversation_memory(
+                    user_id=user_id,
+                    query=message,
+                    answer=agent_response,
+                    metadata={"source": "whatsapp", "profile_name": profile_name},
+                )
+            )
 
         return Response(content=twiml_xml, media_type="text/xml", status_code=200)
 

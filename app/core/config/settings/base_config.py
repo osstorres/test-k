@@ -4,6 +4,7 @@ import decouple
 from app.core import Environment
 from ..database.vector_config import VectorDBSettings
 from .kavak_config import KavakSettings
+from .redis_config import RedisSettings
 import pathlib
 
 ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.resolve()
@@ -14,6 +15,7 @@ class ApplicationSettings(
     VectorDBSettings,
 ):
     kavak: KavakSettings = KavakSettings()
+    redis: RedisSettings = RedisSettings()
 
     TITLE: str = "Kavak Agent API"
     VERSION: str = "1.0.0"

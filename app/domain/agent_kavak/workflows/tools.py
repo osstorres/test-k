@@ -1,62 +1,15 @@
-from typing import Dict, Any, List, Optional, Set
+from typing import Dict, Any, List
 
 from app.core.config.logging import logger
 from app.repository.vector import QdrantVectorRepository, CollectionType
 from app.core.services.kavak_llm_manager import KavakLLMManager
+from app.core.services.cag_manager import get_cag_manager
 from app.models.agent.schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
-from app.utils.normalize import find_closest_make, find_closest_model
 from app.domain.prompts import build_rag_value_prop_prompt
 
-FUZZY_MATCH_THRESHOLD = 70
 DEFAULT_TOP_K = 20
 DEFAULT_RAG_TOP_K = 5
-EMBEDDING_DIMENSION = 1536
 MAX_CATALOG_RESULTS_MULTIPLIER = 2
-
-_known_makes_cache: Optional[Set[str]] = None
-_known_models_cache: Optional[Set[str]] = None
-
-
-async def load_known_makes_models(
-    vector_repository: QdrantVectorRepository,
-) -> tuple[Set[str], Set[str]]:
-    global _known_makes_cache, _known_models_cache
-
-    if _known_makes_cache is not None and _known_models_cache is not None:
-        return _known_makes_cache, _known_models_cache
-
-    try:
-        dummy_embedding = [0.0] * EMBEDDING_DIMENSION
-
-        results = await vector_repository.search(
-            vector=dummy_embedding,
-            top_k=1000,
-            collection=CollectionType.KAVAK_CATALOG,
-        )
-
-        makes = set()
-        models = set()
-
-        for result in results:
-            payload = result.payload if hasattr(result, "payload") else {}
-            if make := payload.get("make"):
-                makes.add(str(make).strip())
-            if model := payload.get("model"):
-                models.add(str(model).strip())
-
-        _known_makes_cache = makes
-        _known_models_cache = models
-
-        logger.info(
-            f"Loaded {len(makes)} makes and {len(models)} models for fuzzy matching"
-        )
-        return makes, models
-
-    except Exception as exc:
-        logger.warning(f"Error loading known makes/models: {exc}, using empty sets")
-        _known_makes_cache = set()
-        _known_models_cache = set()
-        return _known_makes_cache, _known_models_cache
 
 
 async def rag_value_prop_tool(
@@ -64,12 +17,20 @@ async def rag_value_prop_tool(
     vector_repository: QdrantVectorRepository,
     llm_manager: KavakLLMManager,
     top_k: int = DEFAULT_RAG_TOP_K,
+    use_cag: bool = True,
 ) -> RAGAnswer:
     logger.info("Generating RAG answer")
 
     try:
-        embedding = await llm_manager.embed_text(query)
+        if use_cag:
+            cag_manager = get_cag_manager()
+            cached_response = await cag_manager.get_cached_response(
+                cache_type="value_prop", query=query
+            )
+            if cached_response:
+                return cached_response
 
+        embedding = await llm_manager.embed_text(query)
         results = await vector_repository.search(
             vector=embedding,
             top_k=top_k,
@@ -117,7 +78,20 @@ async def rag_value_prop_tool(
         if answer.startswith("Respuesta:"):
             answer = answer.replace("Respuesta:", "").strip()
 
-        return RAGAnswer(answer=answer, sources=sources)
+        response = RAGAnswer(answer=answer, sources=sources)
+
+        if use_cag:
+            try:
+                cag_manager = get_cag_manager()
+                await cag_manager.cache_response(
+                    cache_type="value_prop",
+                    query=query,
+                    response=response,
+                )
+            except Exception as cache_exc:
+                logger.warning(f"Failed to cache response (non-fatal): {cache_exc}")
+
+        return response
 
     except Exception as exc:
         logger.error(f"Error in rag_value_prop_tool: {exc}", exc_info=True)
@@ -136,55 +110,20 @@ async def search_catalog_tool(
     logger.info(f"Searching catalog with preferences: {preferences}")
 
     try:
-        normalized_prefs = preferences.model_dump(exclude_none=True)
-        make = normalized_prefs.get("brand")
-        model = normalized_prefs.get("model")
-
-        known_makes: Optional[Set[str]] = None
-        known_models: Optional[Set[str]] = None
-        if make or model:
-            try:
-                known_makes, known_models = await load_known_makes_models(
-                    vector_repository
-                )
-            except Exception as exc:
-                logger.warning(f"Error loading known makes/models: {exc}")
-
-        if make and known_makes:
-            try:
-                normalized_make = find_closest_make(
-                    make, known_makes, threshold=FUZZY_MATCH_THRESHOLD
-                )
-                if normalized_make:
-                    if normalized_make.lower() != make.lower():
-                        logger.info(f"Normalized make '{make}' to '{normalized_make}'")
-                    normalized_prefs["brand"] = normalized_make
-                    preferences.brand = normalized_make
-            except Exception as exc:
-                logger.warning(f"Error normalizing make: {exc}, using original")
-
-        if model and known_models:
-            try:
-                normalized_model = find_closest_model(
-                    model, known_models, threshold=FUZZY_MATCH_THRESHOLD
-                )
-                if normalized_model:
-                    if normalized_model.lower() != model.lower():
-                        logger.info(
-                            f"Normalized model '{model}' to '{normalized_model}'"
-                        )
-                    normalized_prefs["model"] = normalized_model
-                    preferences.model = normalized_model
-            except Exception as exc:
-                logger.warning(f"Error normalizing model: {exc}, using original")
-
         query_text = _build_catalog_query(preferences)
         embedding = await llm_manager.embed_text(query_text)
         filters = _build_qdrant_filters(preferences)
 
+        search_top_k = top_k * MAX_CATALOG_RESULTS_MULTIPLIER
+        if preferences.order_by:
+            search_top_k = max(search_top_k * 3, 100)
+            logger.info(
+                f"Comparative query detected (order_by={preferences.order_by}), increasing search top_k to {search_top_k}"
+            )
+
         results = await vector_repository.search(
             vector=embedding,
-            top_k=top_k * MAX_CATALOG_RESULTS_MULTIPLIER,
+            top_k=search_top_k,
             filter_by=filters if filters else None,
             collection=CollectionType.KAVAK_CATALOG,
         )
@@ -347,6 +286,20 @@ def _build_catalog_query(preferences: CarPreferences) -> str:
     if preferences.mileage_max:
         parts.append(f"kilometraje bajo hasta {preferences.mileage_max} km")
 
+    if preferences.order_by:
+        if preferences.order_by == "mileage_asc":
+            parts.append("menor kilometraje mínimo")
+        elif preferences.order_by == "mileage_desc":
+            parts.append("mayor kilometraje máximo")
+        elif preferences.order_by == "price_asc":
+            parts.append("más barato precio menor")
+        elif preferences.order_by == "price_desc":
+            parts.append("más caro precio mayor")
+        elif preferences.order_by == "year_desc":
+            parts.append("más nuevo año reciente")
+        elif preferences.order_by == "year_asc":
+            parts.append("más viejo año antiguo")
+
     if parts:
         query = "auto " + " ".join(parts)
     else:
@@ -399,31 +352,52 @@ def _rerank_and_convert(results: List[Any], preferences: CarPreferences) -> List
             if not stock_id or not make or not model or not year or not price:
                 continue
 
-            rerank_score = score
+            if preferences.order_by:
+                if preferences.order_by == "mileage_asc":
+                    sort_key = km if km is not None else float("inf")
+                elif preferences.order_by == "mileage_desc":
+                    sort_key = km if km is not None else float("-inf")
+                elif preferences.order_by == "price_asc":
+                    sort_key = price if price is not None else float("inf")
+                elif preferences.order_by == "price_desc":
+                    sort_key = price if price is not None else float("-inf")
+                elif preferences.order_by == "year_desc":
+                    sort_key = year if year is not None else float("-inf")
+                elif preferences.order_by == "year_asc":
+                    sort_key = year if year is not None else float("inf")
+                else:
+                    sort_key = score
 
-            if preferences.brand and make.lower() == preferences.brand.lower():
-                rerank_score += 0.2
+                rerank_score = sort_key
+                logger.debug(
+                    f"Using order_by={preferences.order_by}, sort_key={sort_key} for car {stock_id}"
+                )
+            else:
+                rerank_score = score
 
-            if preferences.model and model.lower() == preferences.model.lower():
-                rerank_score += 0.2
+                if preferences.brand and make.lower() == preferences.brand.lower():
+                    rerank_score += 0.2
 
-            if preferences.budget_max and price:
-                budget_ratio = price / float(preferences.budget_max)
-                if budget_ratio <= 1.0:
-                    if 0.7 <= budget_ratio <= 0.95:
-                        rerank_score += 0.15
-                    elif budget_ratio > 0.95:
-                        rerank_score += 0.1
-                    else:
-                        rerank_score += 0.05
+                if preferences.model and model.lower() == preferences.model.lower():
+                    rerank_score += 0.2
 
-            if year:
-                year_score = (year - 2000) / 24.0
-                rerank_score += year_score * 0.1
+                if preferences.budget_max and price:
+                    budget_ratio = price / float(preferences.budget_max)
+                    if budget_ratio <= 1.0:
+                        if 0.7 <= budget_ratio <= 0.95:
+                            rerank_score += 0.15
+                        elif budget_ratio > 0.95:
+                            rerank_score += 0.1
+                        else:
+                            rerank_score += 0.05
 
-            if km:
-                mileage_score = 1.0 - min(km / 200000.0, 1.0)
-                rerank_score += mileage_score * 0.1
+                if year:
+                    year_score = (year - 2000) / 24.0
+                    rerank_score += year_score * 0.1
+
+                if km:
+                    mileage_score = 1.0 - min(km / 200000.0, 1.0)
+                    rerank_score += mileage_score * 0.1
 
             bluetooth = payload.get("bluetooth", False)
             car_play = payload.get("car_play", False)
@@ -457,5 +431,11 @@ def _rerank_and_convert(results: List[Any], preferences: CarPreferences) -> List
             logger.warning(f"Error processing car result: {exc}, payload: {payload}")
             continue
 
-    cars_with_scores.sort(key=lambda x: x[0], reverse=True)
+    if preferences.order_by and preferences.order_by.endswith("_asc"):
+        cars_with_scores.sort(key=lambda x: x[0])
+    elif preferences.order_by and preferences.order_by.endswith("_desc"):
+        cars_with_scores.sort(key=lambda x: x[0], reverse=True)
+    else:
+        cars_with_scores.sort(key=lambda x: x[0], reverse=True)
+
     return [car for _, car in cars_with_scores]

@@ -2,15 +2,6 @@ from typing import Literal, Optional, List
 from pydantic import BaseModel, Field
 
 
-class UserIntent(BaseModel):
-    intent: Literal["value_prop", "recommend", "finance", "other"] = Field(
-        description="User intent: value_prop (questions about Kavak), recommend (car recommendations), finance (financing questions), other"
-    )
-    confidence: float = Field(
-        ge=0.0, le=1.0, description="Confidence score for intent classification"
-    )
-
-
 class CarPreferences(BaseModel):
     brand: Optional[str] = Field(None, description="Car brand (normalized)")
     model: Optional[str] = Field(None, description="Car model (normalized)")
@@ -25,6 +16,19 @@ class CarPreferences(BaseModel):
     )
     city: Optional[str] = Field(None, description="City/location preference")
     mileage_max: Optional[int] = Field(None, ge=0, description="Maximum mileage in km")
+    order_by: Optional[
+        Literal[
+            "mileage_asc",
+            "mileage_desc",
+            "price_asc",
+            "price_desc",
+            "year_desc",
+            "year_asc",
+        ]
+    ] = Field(
+        None,
+        description="Order results by: mileage_asc (menor kilometraje), mileage_desc (mayor kilometraje), price_asc (más barato), price_desc (más caro), year_desc (más nuevo), year_asc (más viejo)",
+    )
 
 
 class FinancingPlan(BaseModel):
@@ -61,33 +65,3 @@ class Car(BaseModel):
 class RAGAnswer(BaseModel):
     answer: str = Field(description="Answer text")
     sources: List[str] = Field(default_factory=list, description="Source citations")
-
-
-class BotReply(BaseModel):
-    message: str = Field(description="Response message to user")
-    recommended_car_ids: List[str] = Field(
-        default_factory=list,
-        description="IDs of recommended cars (must exist in catalog)",
-    )
-    financing: Optional[FinancingPlan] = Field(
-        None, description="Financing plan if applicable"
-    )
-    citations: List[str] = Field(
-        default_factory=list, description="Citations for value prop answers"
-    )
-
-
-class UserState(BaseModel):
-    user_id: str = Field(description="User ID")
-    name: Optional[str] = Field(None, description="User name")
-    city: Optional[str] = Field(None, description="User city")
-    intent_stage: Literal["exploring", "comparing", "financing_ready"] = Field(
-        default="exploring", description="Current intent stage"
-    )
-    preferences: Optional[CarPreferences] = Field(None, description="User preferences")
-    last_results: List[str] = Field(
-        default_factory=list, description="IDs of last recommended cars"
-    )
-    financing_context: Optional[dict] = Field(
-        None, description="Financing context (price, down_payment, term, rate)"
-    )
