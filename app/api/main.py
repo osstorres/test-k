@@ -1,8 +1,10 @@
 from fastapi import APIRouter
-from app.api.routes import utils_router
 
-from app.api.routes import kavak_agent_router
-from app.api.routes import whatsapp_router
+from app.api.routes import (
+    utils_router,
+    kavak_agent_router,
+    whatsapp_router,
+)
 
 api_router = APIRouter()
 

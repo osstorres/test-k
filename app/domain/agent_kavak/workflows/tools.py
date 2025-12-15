@@ -1,11 +1,19 @@
 from typing import Dict, Any, List, Optional, Set
+
 from app.core.config.logging import logger
-from app.repository.vector import QdrantVectorRepository
-from app.repository.vector import CollectionType
+from app.repository.vector import QdrantVectorRepository, CollectionType
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.models.agent.schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
 from app.utils.normalize import find_closest_make, find_closest_model
 
+# Constants
+FUZZY_MATCH_THRESHOLD = 70
+DEFAULT_TOP_K = 20
+DEFAULT_RAG_TOP_K = 5
+EMBEDDING_DIMENSION = 1536
+MAX_CATALOG_RESULTS_MULTIPLIER = 2
+
+# Cache for known makes and models
 _known_makes_cache: Optional[Set[str]] = None
 _known_models_cache: Optional[Set[str]] = None
 
@@ -20,7 +28,7 @@ async def load_known_makes_models(
         return _known_makes_cache, _known_models_cache
 
     try:
-        dummy_embedding = [0.0] * 1536
+        dummy_embedding = [0.0] * EMBEDDING_DIMENSION
 
         results = await vector_repository.search(
             vector=dummy_embedding,
@@ -57,7 +65,7 @@ async def rag_value_prop_tool(
     query: str,
     vector_repository: QdrantVectorRepository,
     llm_manager: KavakLLMManager,
-    top_k: int = 5,
+    top_k: int = DEFAULT_RAG_TOP_K,
 ) -> RAGAnswer:
     logger.info("Generating RAG answer")
 
@@ -139,7 +147,7 @@ async def search_catalog_tool(
     preferences: CarPreferences,
     vector_repository: QdrantVectorRepository,
     llm_manager: KavakLLMManager,
-    top_k: int = 20,
+    top_k: int = DEFAULT_TOP_K,
 ) -> List[Car]:
     logger.info(f"Searching catalog with preferences: {preferences}")
 
@@ -148,12 +156,22 @@ async def search_catalog_tool(
         make = normalized_prefs.get("brand")
         model = normalized_prefs.get("model")
 
-        if make:
+        # Load known makes/models once if needed for normalization
+        known_makes: Optional[Set[str]] = None
+        known_models: Optional[Set[str]] = None
+        if make or model:
             try:
                 known_makes, known_models = await load_known_makes_models(
                     vector_repository
                 )
-                normalized_make = find_closest_make(make, known_makes, threshold=70)
+            except Exception as exc:
+                logger.warning(f"Error loading known makes/models: {exc}")
+
+        if make and known_makes:
+            try:
+                normalized_make = find_closest_make(
+                    make, known_makes, threshold=FUZZY_MATCH_THRESHOLD
+                )
                 if normalized_make:
                     if normalized_make.lower() != make.lower():
                         logger.info(f"Normalized make '{make}' to '{normalized_make}'")
@@ -162,12 +180,11 @@ async def search_catalog_tool(
             except Exception as exc:
                 logger.warning(f"Error normalizing make: {exc}, using original")
 
-        if model:
+        if model and known_models:
             try:
-                known_makes, known_models = await load_known_makes_models(
-                    vector_repository
+                normalized_model = find_closest_model(
+                    model, known_models, threshold=FUZZY_MATCH_THRESHOLD
                 )
-                normalized_model = find_closest_model(model, known_models, threshold=70)
                 if normalized_model:
                     if normalized_model.lower() != model.lower():
                         logger.info(
@@ -184,7 +201,7 @@ async def search_catalog_tool(
 
         results = await vector_repository.search(
             vector=embedding,
-            top_k=top_k * 2,
+            top_k=top_k * MAX_CATALOG_RESULTS_MULTIPLIER,
             filter_by=filters if filters else None,
             collection=CollectionType.KAVAK_CATALOG,
         )
