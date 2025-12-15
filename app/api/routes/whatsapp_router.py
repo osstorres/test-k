@@ -7,9 +7,7 @@ from app.core.config.logging import logger
 from app.core.dependencies import KavakFacadeDep
 from app.models.api.api_schemas import TwilioWebhookEvent
 
-
 router = APIRouter(prefix="/mD0UNo976r64HlxkUQbLpp", tags=["whatsapp"])
-
 
 @router.post(
     "/webhook",
