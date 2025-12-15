@@ -1056,6 +1056,19 @@ wheels = [
 ]
 
 [[package]]
+name = "llama-index-memory-mem0"
+version = "0.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llama-index-core" },
+    { name = "mem0ai" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b8/ea/fbdeb18200b0b9b170d48cfe0e23ccea71cc64f3f1a0a55465d931a9ff41/llama_index_memory_mem0-0.4.1.tar.gz", hash = "sha256:1d6e2105b82c4c0c4f0f2bb2bf76b4548fd92e1fd0c9d7eef06f5152a69cc72f", size = 6809 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/09/5cef42d2674c923efd8e878d17c00ecb25becaa55756dcf2ee355ee3e2b7/llama_index_memory_mem0-0.4.1-py3-none-any.whl", hash = "sha256:1b546786f1c0b86d4d874b7850d1e2ec0f05274e228eb6fc95a655d4b2627f99", size = 6674 },
+]
+
+[[package]]
 name = "llama-index-readers-file"
 version = "0.5.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1202,7 +1215,7 @@ wheels = [
 
 [[package]]
 name = "mem0ai"
-version = "1.0.1"
+version = "0.1.116"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "openai" },
@@ -1213,9 +1226,9 @@ dependencies = [
     { name = "qdrant-client" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/39/cd/f9047cd45952af08da8084c2297f8aad780f9ac8558631fc64b3ed235b28/mem0ai-1.0.1.tar.gz", hash = "sha256:53be77f479387e6c07508096eb6c0688150b31152613bdcf6c281246b000b14d", size = 182296 }
+sdist = { url = "https://files.pythonhosted.org/packages/60/a0/10482cc437e96d609d5fbbb65ad8eae144fc84f0cb2655d913bfb58d7dff/mem0ai-0.1.116.tar.gz", hash = "sha256:c33e08c5464f96b1cf109893dba5d394d8cc5788a8400d85cb1ceed696ee3204", size = 122053 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/42/120d6db33e190ef09d69428ddd2eaaa87e10f4c8243af788f5fc524748c9/mem0ai-1.0.1-py3-none-any.whl", hash = "sha256:a8eeca9688e87f175af53d463b4a3b2d552984c81e29bc656c847dc04eaf6f75", size = 275351 },
+    { url = "https://files.pythonhosted.org/packages/4b/70/810bd12d76576402e7c447ffb683f40fdab8cf49eaae6df3db4af48b358f/mem0ai-0.1.116-py3-none-any.whl", hash = "sha256:245b08f1e615e057ebacc52462ab729a7282abe05e8d4957236d893b3d32a990", size = 190315 },
 ]
 
 [[package]]
@@ -2297,8 +2310,8 @@ dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "llama-index" },
+    { name = "llama-index-memory-mem0" },
     { name = "llama-index-vector-stores-qdrant" },
-    { name = "mem0ai" },
     { name = "openai" },
     { name = "pre-commit" },
     { name = "pydantic" },
@@ -2321,8 +2334,8 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.124.4" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "llama-index", specifier = ">=0.14.10" },
+    { name = "llama-index-memory-mem0", specifier = ">=0.4.1" },
     { name = "llama-index-vector-stores-qdrant", specifier = ">=0.9.0" },
-    { name = "mem0ai", specifier = ">=1.0.1" },
     { name = "openai", specifier = ">=2.11.0" },
     { name = "pre-commit", specifier = ">=4.5.0" },
     { name = "pydantic", specifier = ">=2.12.5" },

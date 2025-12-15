@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 from app.core.config.logging import logger
 from app.core.config.settings.kavak_config import KavakSettings
 from mem0 import Memory
@@ -19,53 +19,54 @@ class MemoryManager:
             return
 
         try:
-            kavak_settings = KavakSettings()
-
-            embedding_model = kavak_settings.mem0.EMBEDDING_MODEL
-            vector_size = 1536
-            if "large" in embedding_model.lower():
-                vector_size = 3072
-            elif "ada-002" in embedding_model.lower():
-                vector_size = 1536
-
-            config = {
-                "vector_store": {
-                    "provider": "qdrant",
-                    "config": {
-                        "collection_name": kavak_settings.mem0.COLLECTION_NAME,
-                        "embedding_model_dims": vector_size,
-                        "host": kavak_settings.qdrant.HOST,
-                        "port": kavak_settings.qdrant.PORT,
-                    },
-                },
-                "llm": {
-                    "provider": "openai",
-                    "config": {
-                        "model": kavak_settings.mem0.LLM_MODEL,
-                        "temperature": 0.7,
-                        "api_key": kavak_settings.llm.OPENAI_API_KEY,
-                    },
-                },
-                "embedder": {
-                    "provider": "openai",
-                    "config": {
-                        "model": kavak_settings.mem0.EMBEDDING_MODEL,
-                        "api_key": kavak_settings.llm.OPENAI_API_KEY,
-                    },
-                },
-            }
-
-            if kavak_settings.qdrant.API_KEY:
-                config["vector_store"]["config"]["api_key"] = (
-                    kavak_settings.qdrant.API_KEY
-                )
-
-            self.memory = Memory.from_config(config)
+            self.config = self._build_config()
             self._initialized = True
 
-        except Exception as exc:
-            logger.error(f"Failed to initialize Memory Manager: {exc}")
+        except Exception:
             raise
+
+    def _build_config(self) -> Dict[str, Any]:
+        kavak_settings = KavakSettings()
+
+        embedding_model = kavak_settings.mem0.EMBEDDING_MODEL
+        vector_size = 1536
+        if "large" in embedding_model.lower():
+            vector_size = 3072
+        elif "ada-002" in embedding_model.lower():
+            vector_size = 1536
+
+        config = {
+            "vector_store": {
+                "provider": "qdrant",
+                "config": {
+                    "collection_name": kavak_settings.mem0.COLLECTION_NAME,
+                    "embedding_model_dims": vector_size,
+                    "host": kavak_settings.qdrant.HOST,
+                    "port": kavak_settings.qdrant.PORT,
+                },
+            },
+            "llm": {
+                "provider": "openai",
+                "config": {
+                    "model": kavak_settings.mem0.LLM_MODEL,
+                    "temperature": 0.7,
+                    "api_key": kavak_settings.llm.OPENAI_API_KEY,
+                },
+            },
+            "embedder": {
+                "provider": "openai",
+                "config": {
+                    "model": kavak_settings.mem0.EMBEDDING_MODEL,
+                    "api_key": kavak_settings.llm.OPENAI_API_KEY,
+                },
+            },
+            "version": "v1.1",
+        }
+
+        if kavak_settings.qdrant.API_KEY:
+            config["vector_store"]["config"]["api_key"] = kavak_settings.qdrant.API_KEY
+
+        return config
 
     async def add_conversation_memory(
         self,
@@ -75,28 +76,27 @@ class MemoryManager:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         try:
+            memory = Memory.from_config(self.config)
+
             messages = [
                 {"role": "user", "content": query},
                 {"role": "assistant", "content": answer},
             ]
 
-            result = self.memory.add(messages, user_id=user_id, metadata=metadata or {})
-            logger.info(f"Added memory for user {user_id}")
+            result = memory.add(messages, user_id=user_id, metadata=metadata or {})
+
+            logger.info(
+                f"Added memory for user {user_id}",
+                extra={"extra_fields": {"metadata": metadata}},
+            )
             return {"success": True, "result": result}
 
         except Exception as exc:
-            logger.error(f"Failed to add conversation memory: {exc}", exc_info=True)
+            logger.error(
+                f"Failed to add conversation memory for user {user_id}: {exc}",
+                exc_info=True,
+            )
             return {"success": False, "error": str(exc)}
-
-    async def get_relevant_memories(
-        self, user_id: str, query: str, limit: int = 5
-    ) -> List[Dict[str, Any]]:
-        try:
-            memories = self.memory.search(query=query, user_id=user_id, limit=limit)
-            return memories or []
-        except Exception as exc:
-            logger.error(f"Failed to retrieve memories: {exc}", exc_info=True)
-            return []
 
 
 _memory_manager_instance: Optional[MemoryManager] = None
