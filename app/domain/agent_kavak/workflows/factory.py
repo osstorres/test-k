@@ -2,7 +2,7 @@ from typing import Optional
 from app.core.config.logging import logger
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.core.services.memory_manager import MemoryManager
-from app.persistence.vector.qdrant_repository import QdrantVectorRepository
+from app.repository.vector import QdrantVectorRepository
 from .kavak_agent import KavakAgentWorkflow
 
 

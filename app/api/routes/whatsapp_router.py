@@ -4,7 +4,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 from app.core.config.logging import logger
 from app.core.dependencies import KavakFacadeDep
-from app.models.api_schemas import TwilioWebhookEvent
+from app.models.api.api_schemas import TwilioWebhookEvent
 
 
 router = APIRouter(prefix="/whatsapp", tags=["whatsapp"])

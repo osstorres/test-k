@@ -1,20 +1,12 @@
-"""
-Kavak Agent Facade - Main entry point for Kavak agent operations
-
-Simple facade for Kavak commercial sales agent using LlamaIndex workflows.
-"""
-
 from typing import Dict, Any, Optional
 from app.core.config.logging import logger
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.core.services.memory_manager import MemoryManager
-from app.persistence.vector.qdrant_repository import QdrantVectorRepository
+from app.repository.vector.qdrant_repository import QdrantVectorRepository
 from .workflows.factory import KavakAgentFactory
 
 
 class KavakAgentFacade:
-    """Facade for Kavak agent operations."""
-
     def __init__(
         self,
         llm_manager: KavakLLMManager,
@@ -36,7 +28,6 @@ class KavakAgentFacade:
         user_id: Optional[str] = None,
         **kwargs,
     ) -> Dict[str, Any]:
-        """Process a query using the Kavak agent (uses pre-configured settings)."""
         try:
             logger.info(f"Processing query with Kavak agent for user: {user_id}")
 

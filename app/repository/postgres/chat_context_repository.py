@@ -3,12 +3,12 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy import select, delete
 from app.core.config.logging import logger
 from app.core.config.database.postgres_config import PostgresSettings
-from app.models.chat_interaction import (
+from app.models.agent.chat_interaction import (
     ChatInteraction,
     ChatInteractionCreate,
     ChatContext,
 )
-from app.models.persistence.chat_context_model import ChatContextModel, Base
+from app.persistence.postgres.chat_context_model import ChatContextModel, Base
 
 
 _shared_engine = None

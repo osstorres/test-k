@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.core.config.logging import logger
 from app.core.dependencies import KavakFacadeDep
-from app.models.api_schemas import KavakQueryRequest, KavakQueryResponse
+from app.models.api.api_schemas import KavakQueryRequest, KavakQueryResponse
 
 
 router = APIRouter(prefix="/kavak", tags=["kavak-agent"])

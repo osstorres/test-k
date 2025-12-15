@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import Depends
 from app.core.services.kavak_llm_manager import KavakLLMManager
 from app.core.services.memory_manager import get_memory_manager, MemoryManager
-from app.persistence.vector.qdrant_repository import QdrantVectorRepository
+from app.repository.vector.qdrant_repository import QdrantVectorRepository
 from app.domain.agent_kavak.facade import KavakAgentFacade
 from app.core.config.logging import logger
 

@@ -1,9 +1,9 @@
 from typing import Dict, Any, List, Optional, Set
 from app.core.config.logging import logger
-from app.persistence.vector.qdrant_repository import QdrantVectorRepository
-from app.persistence.vector.collection_config import CollectionType
+from app.repository.vector import QdrantVectorRepository
+from app.repository.vector import CollectionType
 from app.core.services.kavak_llm_manager import KavakLLMManager
-from .schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
+from app.models.agent.schemas import CarPreferences, FinancingPlan, Car, RAGAnswer
 from app.utils.normalize import find_closest_make, find_closest_model
 
 _known_makes_cache: Optional[Set[str]] = None

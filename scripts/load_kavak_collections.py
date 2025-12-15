@@ -15,7 +15,7 @@ from qdrant_client.models import (
 from llama_index.embeddings.openai import OpenAIEmbedding
 
 from app.core.config.settings.kavak_config import KavakSettings
-from app.persistence.vector.collection_config import (
+from app.repository.vector import (
     CollectionType,
     get_collection_config,
 )
