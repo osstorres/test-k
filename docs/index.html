@@ -613,6 +613,10 @@ graph TB
             </ul>
             <div class="diagram">
                 <div class="diagram-title">Arquitectura Completa del Agente</div>
+                <div class="diagram-image" style="margin-top:16px; margin-bottom:16px;">
+                  <img src="https://raw.githubusercontent.com/osstorres/test-k/raw/main/docs/agent.png" alt="Arquitectura Agente" style="max-width: 100%; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);" />
+                  <div style="font-size: 0.9em; color: #777;">Diagrama visual de la arquitectura del agente</div>
+                </div>
                 <div class="mermaid">
 graph TB
     subgraph external["external services"]
@@ -713,6 +717,134 @@ graph TB
                 </div>
             </div>
         </section>
+
+        <section>
+            <h2>Manual de usuario</h2>
+            <p>
+                Para interactuar con el agente comercial de Kavak a través de WhatsApp, sigue estos pasos:
+            </p>
+            
+            <div class="phase">
+                <h3>Paso 1: Unirse al Sandbox de Twilio</h3>
+                <p>
+                    Para comenzar a usar el agente, primero debes unirte al sandbox de Twilio enviando el siguiente código:
+                </p>
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 6px; border-left: 4px solid #4a90e2; margin: 20px 0;">
+                    <p style="margin: 0; font-size: 1.1em;">
+                        <strong>Envía el código:</strong> <span class="highlight">join line-determine</span>
+                    </p>
+                    <p style="margin: 10px 0 0 0; font-size: 1.1em;">
+                        <strong>Al número:</strong> <span class="highlight">+14155238886</span>
+                    </p>
+                </div>
+                <p>
+                    Una vez que hayas enviado este código, recibirás una confirmación de que te has unido al sandbox y podrás comenzar a interactuar con el agente.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Paso 2: Interactuar con el Agente</h3>
+                <p>
+                    Después de unirte al sandbox, puedes comenzar a hacer preguntas al agente sobre:
+                </p>
+                <ul>
+                    <li>La propuesta de valor de Kavak</li>
+                    <li>Información sobre autos disponibles en el catálogo</li>
+                    <li>Cálculos de financiamiento para vehículos</li>
+                    <li>Cualquier otra consulta relacionada con los servicios de Kavak</li>
+                </ul>
+                <p>
+                    El agente procesará tu mensaje y te responderá con información relevante. El <strong>promedio de tiempo de respuesta es de 1 a 7 segundos</strong>, dependiendo de la complejidad de la consulta.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Roadmap para siguientes iteraciones</h2>
+            <p>
+                Esta sección documenta las mejoras y funcionalidades planificadas para futuras iteraciones del agente comercial.
+            </p>
+            
+            <div class="phase">
+                <h3>Mejoras planificadas</h3>
+                <ul>
+                    <li><strong>[LLM]</strong> - Implementar rate limit</li>
+                    <li><strong>[LLM]</strong> - Tomar por variable dinamica en runtime los modelos para no tenerlo por variable de entorno</li>
+                    <li><strong>[LLM]</strong> - Finetunear un modelo con un dataset grande de preguntas respuestas que queremos</li>
+                    <li><strong>[LLM]</strong> - ó entrenar un modelo interno</li>
+                    <li><strong>[Metricas]</strong> - Implementar metricas de negocio que interesen para medir el exito</li>
+                    <li><strong>[Business]</strong> - Guardar el estado de los financiamentos para pasarlos a otro funnel</li>
+                    <li><strong>[Business/metricas]</strong> - Implementar seguimiento de sentimiento del usuario </li>
+                    <li><strong>[Production]</strong> - Soportar diversos idiomas para el agente </li>
+
+                </ul>
+            </div>
+
+            <div class="phase">
+                <h3>Mejora infraestructura</h3>
+                <ul>
+                    <li><strong>[Capa server]</strong> - Migrar a una solución más robusta, sugiero k8s para orquestar el agente, dado que esto podría ser más de un agente
+                    incluso separarlo por paises una infra separada por servicios, enrutamiento de aplicaciones con gateway, reglas de seguridad, etc sería rentable este tipo de infra</li>
+                    <li><strong>[Capa async]</strong> - Migrar a cola de mensajeria para procesar los mensajes y queue de re intentos y una DLQ para errores críticos</li>
+
+                </ul>
+            </div>
+
+            <div class="phase">
+                <h3>Nuevas funcionalidades</h3>
+                <ul>
+                    <li><strong>[Business/metricas]</strong> - Solicitar una encuesta al final de la sesión </li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Medición de métricas</h2>
+            <p>
+                Para evaluar el éxito y la efectividad del agente comercial, se deben monitorear las siguientes métricas clave:
+            </p>
+            
+            <div class="phase">
+                <h3>Métricas de rendimiento</h3>
+                <ul>
+                    <li><strong>Tiempo de respuesta promedio:</strong> Actualmente 1-7 segundos. Objetivo: mantener o mejorar este rango</li>
+                    <li><strong>Latencia del sistema:</strong> Tiempo desde la recepción del mensaje hasta la respuesta completa</li>
+                    <li><strong>Disponibilidad del servicio:</strong> Porcentaje de tiempo que el agente está operativo</li>
+                    <li><strong>[PLACEHOLDER]</strong> - Métrica adicional de rendimiento</li>
+                </ul>
+            </div>
+
+            <div class="phase">
+                <h3>Métricas de calidad</h3>
+                <ul>
+                    <li><strong>Precisión de respuestas:</strong> Porcentaje de respuestas correctas y relevantes</li>
+                    <li><strong>Satisfacción del usuario:</strong> Feedback y calificaciones de los usuarios</li>
+                    <li><strong>Tasa de resolución:</strong> Porcentaje de consultas resueltas sin necesidad de intervención humana</li>
+                    <li><strong>[PLACEHOLDER]</strong> - Métrica adicional de calidad</li>
+                </ul>
+            </div>
+
+            <div class="phase">
+                <h3>Métricas de negocio</h3>
+                <ul>
+                    <li><strong>Volumen de interacciones:</strong> Número total de conversaciones y mensajes procesados</li>
+                    <li><strong>Tasa de conversión:</strong> Porcentaje de usuarios que completan acciones deseadas (consultas de autos, cálculos de financiamiento, etc.)</li>
+                    <li><strong>Engagement del usuario:</strong> Duración promedio de las conversaciones y número de mensajes por sesión</li>
+                    <li><strong>[PLACEHOLDER]</strong> - Métrica adicional de negocio</li>
+                </ul>
+            </div>
+
+            <div class="phase">
+                <h3>Métricas técnicas</h3>
+                <ul>
+                    <li><strong>Uso de herramientas:</strong> Frecuencia de uso de cada herramienta (RAG, catálogo, financiamiento)</li>
+                    <li><strong>Errores y fallos:</strong> Tasa de errores en las respuestas del agente</li>
+                    <li><strong>Uso de recursos:</strong> Consumo de tokens de OpenAI, consultas a bases de datos, etc.</li>
+                    <li><strong>[PLACEHOLDER]</strong> - Métrica técnica adicional</li>
+                </ul>
+            </div>
+        </section>
+
         <section>
             <h2>Proceso de Drafting</h2>
             <p>
