@@ -238,6 +238,45 @@
             display: block;
         }
 
+        .manual-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin-bottom: 50px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .manual-section h2 {
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            border: none;
+            padding: 0;
+        }
+
+        .manual-section p {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .manual-section .phase {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-left: 4px solid #f5576c;
+        }
+
+        .manual-section .phase h3 {
+            color: #f5576c;
+        }
+
+        .manual-section .phase p,
+        .manual-section .phase li {
+            color: #495057;
+        }
+
+        .manual-section .highlight {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
         footer {
             text-align: center;
             margin-top: 60px;
@@ -286,6 +325,47 @@
                 <source src="https://raw.githubusercontent.com/osstorres/test-k/main/docs/record.MP4" type="video/mp4">
                 <p>Tu navegador no soporta la reproducción de videos HTML5. <a href="https://raw.githubusercontent.com/osstorres/test-k/main/docs/record.MP4">Descarga el video aquí</a>.</p>
             </video>
+        </section>
+
+        <section class="manual-section">
+            <h2>📱 Manual de usuario</h2>
+            <p>
+                Para interactuar con el agente comercial de Kavak a través de WhatsApp, sigue estos pasos:
+            </p>
+            
+            <div class="phase">
+                <h3>Paso 1: Unirse al Sandbox de Twilio</h3>
+                <p>
+                    Para comenzar a usar el agente, primero debes unirte al sandbox de Twilio enviando el siguiente código:
+                </p>
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 6px; border-left: 4px solid #f5576c; margin: 20px 0;">
+                    <p style="margin: 0; font-size: 1.1em;">
+                        <strong>Envía el código:</strong> <span class="highlight">join line-determine</span>
+                    </p>
+                    <p style="margin: 10px 0 0 0; font-size: 1.1em;">
+                        <strong>Al número:</strong> <span class="highlight">+14155238886</span>
+                    </p>
+                </div>
+                <p>
+                    Una vez que hayas enviado este código, recibirás una confirmación de que te has unido al sandbox y podrás comenzar a interactuar con el agente.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Paso 2: Interactuar con el Agente</h3>
+                <p>
+                    Después de unirte al sandbox, puedes comenzar a hacer preguntas al agente sobre:
+                </p>
+                <ul>
+                    <li>La propuesta de valor de Kavak</li>
+                    <li>Información sobre autos disponibles en el catálogo</li>
+                    <li>Cálculos de financiamiento para vehículos</li>
+                    <li>Cualquier otra consulta relacionada con los servicios de Kavak</li>
+                </ul>
+                <p>
+                    El agente procesará tu mensaje y te responderá con información relevante. El <strong>promedio de tiempo de respuesta es de 1 a 7 segundos</strong>, dependiendo de la complejidad de la consulta.
+                </p>
+            </div>
         </section>
 
         <section>
@@ -771,47 +851,6 @@ graph TB
     style openai fill:#10a37f,stroke:#0d8c6d,stroke-width:2px,color:#fff
     style twilio fill:#f22f46,stroke:#c91e32,stroke-width:2px,color:#fff
                 </div>
-            </div>
-        </section>
-
-        <section>
-            <h2>Manual de usuario</h2>
-            <p>
-                Para interactuar con el agente comercial de Kavak a través de WhatsApp, sigue estos pasos:
-            </p>
-            
-            <div class="phase">
-                <h3>Paso 1: Unirse al Sandbox de Twilio</h3>
-                <p>
-                    Para comenzar a usar el agente, primero debes unirte al sandbox de Twilio enviando el siguiente código:
-                </p>
-                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 6px; border-left: 4px solid #4a90e2; margin: 20px 0;">
-                    <p style="margin: 0; font-size: 1.1em;">
-                        <strong>Envía el código:</strong> <span class="highlight">join line-determine</span>
-                    </p>
-                    <p style="margin: 10px 0 0 0; font-size: 1.1em;">
-                        <strong>Al número:</strong> <span class="highlight">+14155238886</span>
-                    </p>
-                </div>
-                <p>
-                    Una vez que hayas enviado este código, recibirás una confirmación de que te has unido al sandbox y podrás comenzar a interactuar con el agente.
-                </p>
-            </div>
-
-            <div class="phase">
-                <h3>Paso 2: Interactuar con el Agente</h3>
-                <p>
-                    Después de unirte al sandbox, puedes comenzar a hacer preguntas al agente sobre:
-                </p>
-                <ul>
-                    <li>La propuesta de valor de Kavak</li>
-                    <li>Información sobre autos disponibles en el catálogo</li>
-                    <li>Cálculos de financiamiento para vehículos</li>
-                    <li>Cualquier otra consulta relacionada con los servicios de Kavak</li>
-                </ul>
-                <p>
-                    El agente procesará tu mensaje y te responderá con información relevante. El <strong>promedio de tiempo de respuesta es de 1 a 7 segundos</strong>, dependiendo de la complejidad de la consulta.
-                </p>
             </div>
         </section>
 
