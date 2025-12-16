@@ -884,7 +884,7 @@ graph TB
                     <li><strong>[Metricas]</strong> - Implementar metricas de negocio que interesen para medir el exito</li>
                     <li><strong>[Business]</strong> - Guardar el estado de los financiamentos para pasarlos a otro funnel</li>
                     <li><strong>[Business/metricas]</strong> - Implementar seguimiento de sentimiento del usuario </li>
-                    <li><strong>[Production]</strong> - Soportar diversos idiomas para el agente </li>
+                    <li><strong>[Product]</strong> - Soportar diversos idiomas para el agente </li>
 
                 </ul>
             </div>
@@ -903,6 +903,103 @@ graph TB
                 <h3>Nuevas funcionalidades</h3>
                 <ul>
                     <li><strong>[Business/metricas]</strong> - Solicitar una encuesta al final de la sesión </li>
+                </ul>
+            </div>
+
+            <div class="phase">
+                <h3>Roadmap para producción</h3>
+                <p>
+                    Esta sección responde las preguntas clave sobre cómo llevar el agente a producción de manera segura y escalable.
+                </p>
+                
+                <h4 style="margin-top: 25px; margin-bottom: 15px; color: #4a90e2;">¿Cómo pondrías esto en producción?</h4>
+                <ul>
+                    <li><strong>Infraestructura escalable:</strong> Migrar de App Runner a Kubernetes (EKS) para mejor orquestación, auto-scaling y gestión de múltiples agentes por país/región</li>
+                    <li><strong>Queuede mensajería:</strong> Implementar un sistema de colas (SQS) para procesar mensajes de forma asíncrona, con reintentos automáticos y dlq para errores críticos</li>
+                    <li><strong>Monitoreo y observabilidad:</strong> de momento se configuró arize para monitorear el agente y el llm pero sugiero datadog + new relic + sentry </li>
+                    <li><strong>Rate limiting y throttling:</strong> Implementar límites de tasa a nivel gateway y aplicación para prevenir abusos o mal uso del agente</li>
+                    <li><strong>Backup y disaster recovery:</strong> Estrategia de backups automatizados para postgres y qdrant, con planes de recuperación documentados</li>
+                    <li><strong>Canary deployments:</strong> Despliegues graduales con tráfico dividido entre versión actual y nueva para validar cambios antes de migración completa para mandar nuevas versiones de agente y validar su exito</li>
+                </ul>
+
+                <h4 style="margin-top: 25px; margin-bottom: 15px; color: #4a90e2;">¿Cómo evaluarías el desempeño del agente?</h4>
+                <ul>
+                    <li><strong>Métricas de latencia:</strong> Tiempo de respuesta promedio, p95, p99 desde recepción de mensaje hasta respuesta completa (en este punto de mvp es demasiado lento pero para producción se debe mejorar)</li>
+                    <li><strong>Métricas de calidad:</strong> 
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Precisión de respuestas mediante evaluación humana o LLM-as-judge</li>
+                            <li>Tasa de satisfacción del usuario (encuestas post-interacción)</li>
+                            <li>Tasa de resolución (consultas resueltas sin escalación humana)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Métricas de negocio:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Tasa de conversión (usuarios que completan acciones: consultas de autos, cálculos de financiamiento)</li>
+                            <li>Engagement (duración promedio de conversaciones, número de mensajes por sesión)</li>
+                            <li>Retención (usuarios que regresan a interactuar con el agente)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Métricas técnicas:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Uso de herramientas (frecuencia y éxito de cada tool: RAG, catálogo, financiamiento)</li>
+                            <li>Consumo de tokens de openai (costos por conversación)</li>
+                            <li>Tasa de errores (errores del agente, timeouts, fallos en tools)</li>
+                            <li>Disponibilidad del servicio (uptime, tiempo de inactividad)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Dashboard de métricas:</strong> Dashboard en tiempo real, sugiero grafana, datadog, que consolide todas las métricas clave para monitoreo continuo</li>
+                    <li><strong>Evaluación continua:</strong> Proceso de evaluación periódica con dataset de test cases para detectar degradación en el desempeño</li>
+                </ul>
+
+                <h4 style="margin-top: 25px; margin-bottom: 15px; color: #4a90e2;">¿Cómo probarías que una nueva versión del agente no tiene retroceso en su funcionalidad?</h4>
+                <ul>
+                    <li><strong>Test suite automatizado:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Tests unitarios para cada herramienta (RAG, catálogo, financiamiento)</li>
+                            <li>Tests de integración para flujos completos del agente</li>
+                            <li>Tests end-to-end que simulen conversaciones completas</li>
+                        </ul>
+                    </li>
+                    <li><strong>Evaluación con dataset de referencia:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Dataset curado de preguntas y respuestas esperadas (golden dataset)</li>
+                            <li>Comparación automática de respuestas entre versión actual y nueva usando metricas de similitud</li>
+                            <li>detección de regresiones mediante comparación de embeddings y evaluación LLM-as-judge</li>
+                        </ul>
+                    </li>
+                    <li><strong>A/B Testing:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Despliegue paralelo de versión actual y nueva con tráfico dividido (50/50 o 90/10)</li>
+                            <li>Comparación de métricas clave entre ambas versiones (latencia, precisión, satisfacción)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Canary deployments:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Despliegue gradual del tráfico</li>
+                            <li>Monitoreo continuo de métricas en cada etapa</li>
+                            <li>Rollback automático si se detectan anomalías o degradación</li>
+                        </ul>
+                    </li>
+                    <li><strong>Validación de casos críticos:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Lista de casos de uso críticos que deben funcionar correctamente (happy paths y edge cases)</li>
+                            <li>Ejecución automática de estos casos antes de cada despliegue</li>
+                            <li>Bloqueo del despliegue si algún caso crítico falla</li>
+                        </ul>
+                    </li>
+                    <li><strong>Monitoreo post-despliegue:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Alertas automáticas para métricas que se desvíen de los valores baseline</li>
+                            <li>Comparación de métricas antes/después del despliegue</li>
+                            <li>Revisión manual de muestras aleatorias de conversaciones para validar calidad</li>
+                        </ul>
+                    </li>
+                    <li><strong>Feature flags:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Uso de feature flags para activar/desactivar nuevas funcionalidades sin redeploy</li>
+                            <li>Permite rollback rápido de funcionalidades específicas sin afectar el resto del sistema</li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </section>
