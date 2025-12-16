@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación agente comercial Kavak IA </title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                nodeSpacing: 50,
+                rankSpacing: 80
+            },
+            fontSize: 18,
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+        });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            line-height: 1.8;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #6c757d;
+            font-weight: 400;
+        }
+
+        section {
+            margin-bottom: 50px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            font-weight: 400;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        h3 {
+            font-size: 1.3em;
+            font-weight: 500;
+            color: #495057;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #495057;
+            font-size: 1.05em;
+        }
+
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+            color: #495057;
+        }
+
+        li {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #4a90e2;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-size: 0.9em;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        .phase {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .phase h3 {
+            margin-top: 0;
+            color: #4a90e2;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tech-tag {
+            background-color: #e9ecef;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+
+        a {
+            color: #4a90e2;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        a:hover {
+            border-bottom-color: #4a90e2;
+        }
+
+        .code-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+
+        .code-link::after {
+            content: "→";
+            font-size: 0.9em;
+        }
+
+        .diagram {
+            background-color: #f8f9fa;
+            padding: 40px;
+            border-radius: 6px;
+            margin: 30px 0;
+            text-align: center;
+            overflow-x: auto;
+            overflow-y: visible;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .diagram .mermaid {
+            background-color: white;
+            padding: 30px;
+            border-radius: 6px;
+            display: inline-block;
+            min-width: 100%;
+            transform-origin: top center;
+        }
+
+        .diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .diagram-title {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 25px;
+            font-style: normal;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            section {
+                padding: 25px;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            .diagram {
+                padding: 20px 15px;
+            }
+
+            .diagram .mermaid {
+                padding: 20px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Proceso creativo</h1>
+            <p class="subtitle">Agente comercial Kavak IA </p>
+            <p style="margin-top: 15px;">
+                <a href="https://github.com/osstorres/test-k" target="_blank" style="font-size: 0.95em;">Ver código en GitHub →</a>
+            </p>
+        </header>
+
+        <section>
+            <h2>Introducción</h2>
+            <p>
+                Idea clara: crear un agente comercial lo más efectivo posible para responder preguntas sobre la propuesta de valor de la empresa, asesorar en financiamiento y brindar un catalogo de autos.
+            </p>
+            <p>
+                El agente comercial necesitaba ser capaz de entender errores en la redacción de marcas y modelos, recomendar autos disponibles según lo que el cliente pidiera y calcular planes de financiamiento basados en enganche, precio del auto, tasa de interés del 10% y plazos de entre 3 y 6 años.
+            </p>
+        </section>
+
+        <section>
+            <h2>Fase de investigación y diseño</h2>
+            
+            <div class="phase">
+                <h3>Paso 1: Entender el comportamiento esperado</h3>
+                <p>
+                    Lo primero fue obtener datos sobre cómo queríamos que se comportara el agente. Se crearon preguntas y respuestas de ejemplos y lo consultamos con un par de personas si le parecía que estas preguntas ayudarían a entender la propuesta de valor y lograr obtener info de autos y un posible financiamiento.
+                Aquí puedes consultar el <a href="https://docs.google.com/spreadsheets/d/1PNPl46qGuZdF7ODEpZG8cNiwld1tfoD93bVc9JZ6c7U/edit?usp=sharing" target="_blank">documento de preguntas y respuestas de muestra</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Paso 2: Investigación de tecnologías</h3>
+                <p>
+                    Se investigó que llm nos beneficiaría más para este caso de uso. También validamos si necesitábamos un agente completo o solo un sistema RAG, y si valía la pena usar una base de datos vectorial para almacenar la información.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Paso 3: decisiones arquitectónicas</h3>
+                <p>
+                    Se evalúo si valía la pena integrar mem0 para gestionar las preferencias del usuario. Diseñamos un diagrama de alto nivel con todos los componentes que se requerían integrar y qué frameworks.
+                </p>
+                <p>
+                    La decisión final fue usar:
+                </p>
+                <div class="tech-stack">
+                    <span class="tech-tag">FastAPI</span>
+                    <span class="tech-tag">LlamaIndex</span>
+                    <span class="tech-tag">Qdrant</span>
+                    <span class="tech-tag">PostgreSQL</span>
+                    <span class="tech-tag">Mem0</span>
+                    <span class="tech-tag">OpenAI</span>
+                    <span class="tech-tag">Redis</span>
+                    <span class="tech-tag">Twilio</span>
+                </div>
+                <div class="tech-reasons" style="margin-top:25px;">
+                    <h4>¿Por qué elegí cada tecnología?</h4>
+                    <ul>
+                        <li><strong>FastAPI:</strong> Entrypoint simple al requerir un webhook para recibir eventos de twilio, facil integración y despliegue</li>
+                        <li><strong>LlamaIndex:</strong> Requería un orquestador de steps para el agente, langchain personalmente no me gusta al tener demasiado wrapper que no requeria en este punto, no tenia sentido usarlo, opté por llamaindex 
+                        ya que también durante pruebas necesitaba evaluar si sería un workflow determinisico o no, llamaindex me permitió hacer pruebas rápidas para este y para montar un agente react, esto me permitío velocidad para evaluar 
+                    los resultados, que al final opté por solo usar ReacAgent, y optar por hacerlo vanilla con metodos simples para un mvp claro no me convencía tampoco.</li>
+                        <li><strong>Qdrant:</strong> Decisión meramente por temas de filtrado, chroma, pinecone fueron parte de la decisión pero opté por qdrant por la facilidad de implementación y el filtrado que ofrece se me hace bastante robusto para nuestro caso de catalogo de autos</li>
+                        <li><strong>PostgreSQL:</strong> Unicamente para guardar el history chat, bien pudo ser un noSQL pero opté por una estructurada</li>
+                        <li><strong>Mem0:</strong> Basico para guardar preferencias del usuario, ya que no se requiere un historial largo de conversaciones, esto solo está implementado para guardar preferencias del usuario pero no se usan en prompting ni en context actualmente</li>
+                        <li><strong>OpenAI:</strong> Mi propuesta a versión2 se basa en finetunear un modelo para el agente, openai brinda la posibilidad de hacerlo, ademas de que brinda embeddings buenos para la vectorDB y basicamente me da lo necesario para answering, embedding, y se integra con mem0 también para embedding, se pensó usar gemini para embedding porque por pruebas 
+                        e investigación en lenguaje español gemini tiene buenos resultados de embedding pero tambien a futuro esto se debeería poder abrir a varios lenguajes, un tradeoff que podria revisarse o usar diferentes embeddings para diferentes lenguajes</li>
+                        <li><strong>Redis:</strong> Para levantar un CAG, unicamente implementado en el valueProp para objetivo de pruebas</li>
+                        <li><strong>Twilio:</strong> Facil integración de senders whatsapp y con sandbox</li>
+                    </ul>
+                </div>
+
+            <div class="phase">
+                <h3>Paso 4: diseño de infraestructura</h3>
+                <p>
+                    Preparamos la infraestructura para el MVP. se decidió usar AWS con App Runner para el servicio, RDS para la base de datos y ECR para almacenar las imágenes de Docker. Todo esto dentro de una VPC con subredes públicas y privadas para mantener la seguridad.
+                    AWS por la facilidad de levantar recursos, personalmente me gusta apprunner para levantar MVPs y necesitaba algo simple para dejarlo andando y usar sobre todo secrets.
+                </p>
+                <p>
+                    Se puede revisar la configuración de infraestructura en <a href="https://github.com/osstorres/test-k/tree/main/infrastructure/terraform" target="_blank" class="code-link">infrastructure/terraform</a>.
+                </p>
+                <div class="diagram">
+                    <div class="diagram-title">Diagrama de Infraestructura</div>
+                    <div class="mermaid">
+graph LR
+    subgraph external[" "]
+        users[users]
+        internet[internet]
+    end
+    
+    subgraph vpc["vpc 10.0.0.0/16"]
+        subgraph public["public subnets"]
+            igw[internet gateway]
+            nat[nat gateway]
+        end
+        
+        subgraph private["private subnets"]
+            app_runner[app runner<br/>service]
+            rds[rds database]
+        end
+        
+        ecr[ecr<br/>repository]
+    end
+    
+    users -->|https| internet
+    internet -->|requests| app_runner
+    app_runner <-->|queries| rds
+    app_runner -->|pulls images| ecr
+    private -.->|egress| nat
+    nat --> igw
+    igw --> internet
+    
+    style app_runner fill:#4a90e2,stroke:#2e5c8a,stroke-width:2px,color:#fff
+    style rds fill:#f5a623,stroke:#d68910,stroke-width:2px,color:#fff
+    style ecr fill:#9013fe,stroke:#6a1b9a,stroke-width:2px,color:#fff
+    style vpc fill:#f8f9fa,stroke:#dee2e6,stroke-width:2px
+    style public fill:#e3f2fd,stroke:#90caf9,stroke-width:1px
+    style private fill:#fff3e0,stroke:#ffcc80,stroke-width:1px
+    style igw fill:#81c784,stroke:#66bb6a,stroke-width:2px,color:#fff
+    style nat fill:#64b5f6,stroke:#42a5f5,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Fase de configuración base</h2>
+            
+            <div class="phase">
+                <h3>Preparación del proyecto</h3>
+                <p>
+                    dependencias necesarias, las variables de entorno y el sistema de logging para tener visibilidad de lo que estaba pasando en el sistema.
+                </p>
+                <p>
+                    La configuración base del proyecto se encuentra en <a href="https://github.com/osstorres/test-k/tree/main/app/core/config" target="_blank" class="code-link">app/core/config</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Configuración de persistencia</h3>
+                <p>
+                    se configuró PostgreSQL para almacenar el contexto de las conversaciones y preparamos Qdrant como el vector store, el gestor de llm para interactuar con openai y configuración del sistema de embeddings.
+                </p>
+                <p>
+                    La configuración de persistencia está en <a href="https://github.com/osstorres/test-k/tree/main/app/core/config/database" target="_blank" class="code-link">app/core/config/database</a>, con la configuración de PostgreSQL en <a href="https://github.com/osstorres/test-k/tree/main/app/core/config/database/postgres_config.py" target="_blank">postgres_config.py</a> y Qdrant en <a href="https://github.com/osstorres/test-k/tree/main/app/core/config/database/vector_config.py" target="_blank">vector_config.py</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Integración con llamaIndex</h3>
+                <p>
+                    Se integró llamaindex para construir el agente, el repositorio de Qdrant y configuración de las colecciones necesarias: una para el catálogo de autos (kavak_catalog) y otra para la propuesta de valor (kavak_value_prop).
+                </p>
+                <p>
+                    El repositorio de Qdrant se implementó en <a href="https://github.com/osstorres/test-k/tree/main/app/repository/vector" target="_blank" class="code-link">app/repository/vector</a>, y la configuración de colecciones está en <a href="https://github.com/osstorres/test-k/tree/main/app/repository/vector/collection_config.py" target="_blank">collection_config.py</a>. El gestor de LLM se encuentra en <a href="https://github.com/osstorres/test-k/tree/main/app/core/services/kavak_llm_manager.py" target="_blank">app/core/services/kavak_llm_manager.py</a>.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Fase de carga de datos</h2>
+            
+            <div class="phase">
+                <h3>Script de upload</h3>
+                <p>
+                    Se creó un script simple para cargar datos, dos collections, una con los catalogos y otra con la propuesta de valor, estos datos fueron transformados en embeddings usando el llm y almacenados en las colecciones correspondientes.
+                </p>
+                <p>
+                   La decisión de ingestar el valueProp y el catalogo de datos fue porque es basico una busqueda semantica al tener una cantidad de autos inmensa(en ambiente de producción), esto nos facilita la busqueda de autos, la propuesta de valor bien no pudo ser 
+                   ingestada a un semantic search al no tener una data estructurada muy clara pero se revisó la pagina y se diseñaron secciones y la estrategia para poder acoplar e ingestarla aqui, se pudieron buscar otras soluciones como entrenar directamente al modelo con data y tal pero
+                   para este proposito funcionó, ademas de que se tiene un CAG para queries recurrentes como "sedes de mty" donde pueden repetirse y la data no deberia cambiar con un TTL corto, nos ahorra costos en valueProp y lo mismo lo tenemos indexado en qdrant.
+                <p>
+                    El script principal de carga está en <a href="https://github.com/osstorres/test-k/tree/main/scripts/load_kavak_collections.py" target="_blank" class="code-link">scripts/load_kavak_collections.py</a>.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Fase de desarrollo del agente</h2>
+            
+            <div class="phase">
+                <h3>Tools</h3>
+                <p>
+                    Se crearon las tools que permitirán al agente buscar información en las colecciones, estas tools usarían búsqueda semántica para encontrar la información más relevante según la consulta del usuario.
+                </p>
+                <p>
+                    las tools se implementaron en <a href="https://github.com/osstorres/test-k/tree/main/app/domain/prompts/rag" target="_blank" class="code-link">app/domain/prompts/rag</a>, específicamente en <a href="https://github.com/osstorres/test-k/tree/main/app/domain/prompts/rag/value_prop_rag.py" target="_blank">value_prop_rag.py</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Schemas de datos</h3>
+                <p>
+                    Se definieron schemas de datos necesarios para estructurar la información que el agente manejaría: preferencias del usuario, contexto de chat, información de autos, etc.
+                </p>
+                <p>
+                    Los schemas del agente están definidos en <a href="https://github.com/osstorres/test-k/tree/main/app/models/agent" target="_blank" class="code-link">app/models/agent</a>, y los schemas de la API en <a href="https://github.com/osstorres/test-k/tree/main/app/models/api" target="_blank">app/models/api</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Explicación de las tools del agente</h3>
+                <p>
+                    Desarrollamos tres herramientas principales para el agente:
+                </p>
+                <ul>
+                    <li><span class="highlight">tool RAG de Propuesta de Valor:</span> Busca información sobre los beneficios y características de Kavak</li>
+                    <li><span class="highlight">tool de Búsqueda en Catálogo:</span> Encuentra autos disponibles según las preferencias del usuario</li>
+                    <li><span class="highlight">tool de Cálculo de Financiamiento:</span> Calcula planes de financiamiento con los parámetros especificados</li>
+                </ul>
+                <p>
+                    Todas las tool del agente están implementadas en <a href="https://github.com/osstorres/test-k/tree/main/app/domain/agent_kavak/workflows/tools.py" target="_blank" class="code-link">app/domain/agent_kavak/workflows/tools.py</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Workflow Agente ReAct</h3>
+                <p>
+                    El agente principal está implementado en <a href="https://github.com/osstorres/test-k/tree/main/app/domain/agent_kavak/workflows/kavak_agent.py" target="_blank" class="code-link">app/domain/agent_kavak/workflows/kavak_agent.py</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>Factory de workflows</h3>
+                <p>
+                    se impementó una factory de workflows que nos permite cambiar fácilmente entre diferentes tipos de agentes o workflows según fuera necesario, manteniendo el código modular y extensible.
+                </p>
+                <p>
+                    La factory de workflows está en <a href="https://github.com/osstorres/test-k/tree/main/app/domain/agent_kavak/workflows/factory.py" target="_blank" class="code-link">app/domain/agent_kavak/workflows/factory.py</a>, y la fachada del agente en <a href="https://github.com/osstorres/test-k/tree/main/app/domain/agent_kavak/facade.py" target="_blank">app/domain/agent_kavak/facade.py</a>.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Fase de gestión de memory y contexto</h2>
+            
+            <div class="phase">
+                <h3>repository de contexto de chat</h3>
+                <p>
+                   el repository de contexto de chat en PostgreSQL para almacenar el historial de conversaciones. Esto permite que el agente tenga contexto sobre conversaciones previas con el mismo usuario. (por pruebas max 5 interacciónes)
+                </p>
+                <p>
+                    El modelo de contexto de chat está en <a href="https://github.com/osstorres/test-k/tree/main/app/persistence/postgres/chat_context_model.py" target="_blank" class="code-link">app/persistence/postgres/chat_context_model.py</a>, y el repositorio en <a href="https://github.com/osstorres/test-k/tree/main/app/repository/postgres/chat_context_repository.py" target="_blank">app/repository/postgres/chat_context_repository.py</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>integración con mem0</h3>
+                <p>
+                    mem0 para gestionar la memoria del usuario, mem0 nos permite almacenar y recuperar preferencias del usuario de manera estructurada, mejorando las recomendaciones del agente con el tiempo.
+                </p>
+                <p>
+                    el manager de memoria está implementado en <a href="https://github.com/osstorres/test-k/tree/main/app/core/services/memory_manager.py" target="_blank" class="code-link">app/core/services/memory_manager.py</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>build de contexto de chat</h3>
+                <p>
+                     la lógica para construir el contexto de conversación combinando el historial de chat almacenado en PostgreSQL, las preferencias del usuario de Mem0 y la información relevante obtenida mediante RAG.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Fase de api e integración</h2>
+            
+            <div class="phase">
+                <h3>Preparación de fastapi</h3>
+                <p>
+                    fastapi como nuestro framework web principal. Configuramos las dependencias e inyección de dependencias para mantener el código desacoplado y testeable.
+                </p>
+                <p>
+                    la aplicación principal está en <a href="https://github.com/osstorres/test-k/tree/main/app/api/main.py" target="_blank" class="code-link">app/api/main.py</a>, y las dependencias en <a href="https://github.com/osstorres/test-k/tree/main/app/core/dependencies.py" target="_blank">app/core/dependencies.py</a>. El punto de entrada de la aplicación está en <a href="https://github.com/osstorres/test-k/tree/main/app/main.py" target="_blank">app/main.py</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>routing de la api</h3>
+                <p>
+                    Creamos tres routers principales:
+                </p>
+                <ul>
+                    <li><span class="highlight">Router de WhatsApp:</span> webhook para twilio</li>
+                    <li><span class="highlight">Router del Agente Kavak:</span> Expone endpoints para interactuar directamente con el agente, este lo desactivé en prod</li>
+                    <li><span class="highlight">Router de Utilidades:</span> Proporciona endpoints auxiliares para testing y monitoreo</li>
+                </ul>
+                <p>
+                    todos los routers están en <a href="https://github.com/osstorres/test-k/tree/main/app/api/routes" target="_blank" class="code-link">app/api/routes</a>: <a href="https://github.com/osstorres/test-k/tree/main/app/api/routes/whatsapp_router.py" target="_blank">whatsapp_router.py</a>, <a href="https://github.com/osstorres/test-k/tree/main/app/api/routes/kavak_agent_router.py" target="_blank">kavak_agent_router.py</a> y <a href="https://github.com/osstorres/test-k/tree/main/app/api/routes/utils_router.py" target="_blank">utils_router.py</a>.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>integración con twilio</h3>
+                <div class="diagram">
+                    <div class="diagram-title">Flujo General del Sistema</div>
+                    <div class="mermaid">
+graph TB
+    User[Usuario] -->|Mensaje WhatsApp| Twilio[Twilio]
+    Twilio -->|Webhook| FastAPI[FastAPI Entry Point]
+    
+    FastAPI -->|Consulta RAG| RAG[RAG Qdrant]
+    FastAPI -->|Almacenar Contexto| Postgres[(PostgreSQL)]
+    FastAPI -->|Gestión Memoria| Mem0[Memory Manager<br/>Mem0]
+    
+    RAG -->|Búsqueda Vectorial| Catalog[kavak_catalog<br/>Colección]
+    RAG -->|Búsqueda Vectorial| ValueProp[kavak_value_prop<br/>Colección]
+    RAG -->|Embeddings| OpenAI[OpenAI<br/>LLM & Embeddings]
+    
+    Mem0 -->|Almacenar/Recuperar| MemoColl[memo_coll<br/>Colección Qdrant]
+    Mem0 -->|Procesamiento| OpenAI
+    
+    Postgres -.->|Contexto Chat| FastAPI
+    
+    style User fill:#e1f5ff
+    style Twilio fill:#ffcccc
+    style FastAPI fill:#cce5ff
+    style RAG fill:#cce5ff
+    style Postgres fill:#cce5ff
+    style Mem0 fill:#cce5ff
+    style Catalog fill:#fff4cc
+    style ValueProp fill:#fff4cc
+    style MemoColl fill:#fff4cc
+    style OpenAI fill:#ccffcc
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>IAC</h2>
+            
+            <div class="phase">
+                <h3>Configuración LOCAL</h3>
+                <p>
+                  docker de toda la vida para poder ejecutar el app local 
+                </p>
+                <p>
+                    la configuración de Docker está en el <a href="https://github.com/osstorres/test-k/blob/main/Dockerfile" target="_blank" class="code-link">Dockerfile</a> y <a href="https://github.com/osstorres/test-k/blob/main/docker-compose.yaml" target="_blank">docker-compose.yaml</a> en la raíz del proyecto.
+                </p>
+            </div>
+
+            <div class="phase">
+                <h3>module de terraform</h3>
+                <p>
+                 módulos base de Terraform para definir la infraestructura en AWS. Configuramos los ambientes (desarrollo, staging y producción) con sus respectivas configuraciones, a gusto personal me gusta tener los ambientes separados y los modulos que voy a usar como receta para generar los que necesite
+                </p>
+                <p>
+                    Los módulos de Terraform están en <a href="https://github.com/osstorres/test-k/tree/main/infrastructure/terraform/modules" target="_blank" class="code-link">infrastructure/terraform/modules</a>, y las configuraciones de ambientes en <a href="https://github.com/osstorres/test-k/tree/main/infrastructure/terraform/envs" target="_blank">infrastructure/terraform/envs</a>.
+                </p>
+            </div>
+        </section>
+
+      
+
+        <section>
+            <h2>Arquitectura Final</h2>
+            <p>
+                El sistema final tiene una arquitectura en capas bien definida:
+            </p>
+            <ul>
+                <li><span class="highlight">API:</span> FastAPI con routers para WhatsApp, el agente Kavak y utilidades</li>
+                <li><span class="highlight">Facade:</span> Facade del agente Kavak y factory de workflows</li>
+                <li><span class="highlight">Agente:</span> Agente ReAct de LlamaIndex con herramientas RAG, búsqueda de catálogo y cálculo de financiamiento</li>
+                <li><span class="highlight">Servicios:</span> Gestor de LLM, gestor de memoria (Mem0) y gestor de caché (Redis)</li>
+                <li><span class="highlight">Repositorios:</span> Repositorio de Qdrant y repositorio de contexto de chat en PostgreSQL</li>
+                <li><span class="highlight">Persistencia:</span> PostgreSQL para historial, Qdrant para vectores y Redis para caché</li>
+            </ul>
+            <div class="diagram">
+                <div class="diagram-title">Arquitectura Completa del Agente</div>
+                <div class="mermaid">
+graph TB
+    subgraph external["external services"]
+        twilio[twilio whatsapp]
+        openai[openai api<br/>llm + embeddings]
+    end
+    
+    subgraph api["api layer"]
+        fastapi[fastapi app]
+        router[api router]
+        whatsapp[whatsapp router]
+        kavak_route[kavak router]
+        utils[utils router]
+    end
+    
+    subgraph facade["facade layer"]
+        facade_comp[kavak agent facade]
+        factory[agent factory]
+    end
+    
+    subgraph agent["agent workflow"]
+        react[react agent<br/>llama-index]
+        
+        rag_tool[rag value prop tool]
+        catalog_tool[search catalog tool]
+        finance_tool[compute financing tool]
+    end
+    
+    subgraph services["services"]
+        llm[kavak llm manager]
+        memory[memory manager<br/>mem0]
+        cache[cag manager<br/>redis]
+    end
+    
+    subgraph repos["repositories"]
+        qdrant_repo[qdrant repository]
+        pg_repo[chat context repo]
+    end
+    
+    subgraph storage["data storage"]
+        pg[(postgresql<br/>chat history)]
+        qdrant[(qdrant<br/>value prop<br/>catalog<br/>memory)]
+        redis_db[(redis<br/>cache)]
+    end
+    
+    twilio -->|webhook| whatsapp
+    fastapi --> router
+    router --> whatsapp
+    router --> kavak_route
+    router --> utils
+    
+    whatsapp --> facade_comp
+    kavak_route --> facade_comp
+    
+    facade_comp --> factory
+    facade_comp --> llm
+    facade_comp --> qdrant_repo
+    facade_comp --> memory
+    
+    factory --> react
+    
+    react -->|uses| rag_tool
+    react -->|uses| catalog_tool
+    react -->|uses| finance_tool
+    react -->|queries| llm
+    react -->|reads/writes| pg_repo
+    
+    rag_tool -->|vector search| qdrant_repo
+    rag_tool -->|generate answer| llm
+    rag_tool -->|check cache| cache
+    
+    catalog_tool -->|vector search| qdrant_repo
+    catalog_tool -->|embed query| llm
+    
+    finance_tool -->|pure calculation| finance_tool
+    
+    llm -->|api calls| openai
+    
+    memory -->|stores vectors| qdrant_repo
+    cache -->|read/write| redis_db
+    
+    qdrant_repo --> qdrant
+    pg_repo --> pg
+    
+    style fastapi fill:#4a90e2,stroke:#2e5c8a,stroke-width:2px,color:#fff
+    style facade_comp fill:#f5a623,stroke:#d68910,stroke-width:2px,color:#fff
+    style react fill:#9013fe,stroke:#6a1b9a,stroke-width:2px,color:#fff
+    style llm fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+    style qdrant_repo fill:#27ae60,stroke:#229954,stroke-width:2px,color:#fff
+    style pg_repo fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style memory fill:#9b59b6,stroke:#8e44ad,stroke-width:2px,color:#fff
+    style cache fill:#e67e22,stroke:#d35400,stroke-width:2px,color:#fff
+    style pg fill:#34495e,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style qdrant fill:#16a085,stroke:#138d75,stroke-width:2px,color:#fff
+    style redis_db fill:#c0392b,stroke:#a93226,stroke-width:2px,color:#fff
+    style openai fill:#10a37f,stroke:#0d8c6d,stroke-width:2px,color:#fff
+    style twilio fill:#f22f46,stroke:#c91e32,stroke-width:2px,color:#fff
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>Proceso de Drafting</h2>
+            <p>
+                En esta sección se documenta la evolución y refinamiento del diseño del agente, mostrando los diferentes "drafts" o versiones conceptuales hasta llegar a la arquitectura final.
+            </p>
+            
+            <h3>Draft v1</h3>
+            <img src="../assets/img.png" alt="Draft v1" style="max-width:480px;width:100%;margin-bottom: 24px; box-shadow:0 1px 6px rgba(0,0,0,0.08);border-radius:6px;">
+
+            <h3>Draft v2</h3>
+            <img src="../assets/img.png" alt="Draft v2" style="max-width:480px;width:100%;margin-bottom: 24px; box-shadow:0 1px 6px rgba(0,0,0,0.08);border-radius:6px;">
+            
+            <h3>Draft v3 refinado</h3>
+            <div class="diagram">
+                <div class="diagram-title">Diagrama refinado del flujo</div>
+                <pre class="mermaid">
+graph TB
+    User[Usuario] -->|Mensaje WhatsApp| Twilio[Twilio]
+    Twilio -->|Webhook| FastAPI[FastAPI Entry Point]
+    
+    FastAPI -->|Consulta RAG| RAG[RAG Qdrant]
+    FastAPI -->|Almacenar Contexto| Postgres[(PostgreSQL)]
+    FastAPI -->|Gestión Memoria| Mem0[Memory Manager<br/>Mem0]
+    
+    RAG -->|Búsqueda Vectorial| Catalog[kavak_catalog<br/>Colección]
+    RAG -->|Búsqueda Vectorial| ValueProp[kavak_value_prop<br/>Colección]
+    RAG -->|Embeddings| OpenAI[OpenAI<br/>LLM & Embeddings]
+    
+    Mem0 -->|Almacenar/Recuperar| MemoColl[memo_coll<br/>Colección Qdrant]
+    Mem0 -->|Procesamiento| OpenAI
+    
+    Postgres -.->|Contexto Chat| FastAPI
+    
+    style User fill:#e1f5ff
+    style Twilio fill:#ffcccc
+    style FastAPI fill:#cce5ff
+    style RAG fill:#cce5ff
+    style Postgres fill:#cce5ff
+    style Mem0 fill:#cce5ff
+    style Catalog fill:#fff4cc
+    style ValueProp fill:#fff4cc
+    style MemoColl fill:#fff4cc
+    style OpenAI fill:#ccffcc
+                </pre>
+            </div>
+        </section>
+        <footer>
+            <p>No se nada de frontend solo metí el texto y recé que saliera bien, saludos</p>
+        </footer>
+    </div>
+</body>
+</html>
+
