@@ -278,6 +278,148 @@
             color: #856404;
         }
 
+        .user-profiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .user-profile {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .user-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .user-icon {
+            font-size: 2.5em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-profile h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+
+        .user-profile .context {
+            font-size: 0.95em;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .user-profile .tasks {
+            margin-bottom: 20px;
+        }
+
+        .user-profile .tasks ul {
+            margin-left: 20px;
+            font-size: 0.95em;
+        }
+
+        .user-profile .results {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .user-profile .results h4 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 1em;
+            color: #495057;
+        }
+
+        .user-profile .results ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 0.9em;
+        }
+
+        .conversation-example {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        .conversation-example h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1em;
+            color: #495057;
+        }
+
+        .conversation-item {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .conversation-item.user {
+            background-color: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+
+        .conversation-item.agent {
+            background-color: #f1f8e9;
+            border-left: 3px solid #8bc34a;
+        }
+
+        .conversation-item .label {
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .conversation-item.user .label {
+            color: #1976d2;
+        }
+
+        .conversation-item.agent .label {
+            color: #689f38;
+        }
+
+        .conversation-item .message {
+            font-size: 0.9em;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .user-profiles {
+                grid-template-columns: 1fr;
+            }
+        }
+
         footer {
             text-align: center;
             margin-top: 60px;
@@ -1045,6 +1187,149 @@ graph TB
                     <li><strong>Uso de recursos:</strong> Consumo de tokens de OpenAI, consultas a bases de datos, etc.</li>
                 </ul>
             </div>
+        </section>
+
+        <section>
+            <h2>Testing con usuarios reales</h2>
+            <p>
+                Se realizó un testing con tres usuarios reales de diferentes perfiles para evaluar la efectividad del agente en escenarios reales. Cada usuario interactuó con el agente y evaluó su experiencia en 4 métricas clave (escala 1-10).
+            </p>
+            
+            <div class="phase">
+                <h3>Métricas de evaluación</h3>
+                <p>
+                    Las métricas utilizadas para evaluar el desempeño del agente fueron:
+                </p>
+                <ul>
+                    <li><strong>Satisfacción general:</strong> ¿Qué tan satisfecho quedó el usuario con la interacción? (1 = Muy insatisfecho, 10 = Muy satisfecho)</li>
+                    <li><strong>Claridad de respuestas:</strong> ¿Qué tan claras y útiles fueron las respuestas del agente? (1 = Muy confusas, 10 = Muy claras y útiles)</li>
+                    <li><strong>Éxito en completar la tarea:</strong> ¿Logró el usuario completar su objetivo? (1 = No logró nada, 10 = Completó exitosamente su objetivo)</li>
+                </ul>
+            </div>
+
+            <div class="user-profiles">
+                <div class="user-profile">
+                    <div class="user-profile-header">
+                        <div class="user-icon">👤</div>
+                        <h3>Perfil 1: Maestra de prescolar</h3>
+                    </div>
+                    <p class="context">
+                        <strong>Contexto:</strong> Usuario sin experiencia previa comprando autos, busca información general sobre opciones disponibles y proceso de compra.
+                    </p>
+                    <div class="tasks">
+                        <strong>Tareas realizadas:</strong>
+                        <ul>
+                            <li>Consultar información sobre la propuesta de valor de Kavak</li>
+                            <li>Buscar autos disponibles según preferencias básicas</li>
+                            <li>Entender el proceso de compra</li>
+                        </ul>
+                    </div>
+                    <div class="results">
+                        <h4>Resultados de evaluación:</h4>
+                        <ul>
+                            <li><strong>Satisfacción general:</strong> 7 / 10</li>
+                            <li><strong>Claridad de respuestas:</strong> 10 / 10</li>
+                            <li><strong>Éxito en completar la tarea:</strong> 8 / 10</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="user-profile">
+                    <div class="user-profile-header">
+                        <div class="user-icon">👤</div>
+                        <h3>Perfil 2: Ingeniero</h3>
+                    </div>
+                    <p class="context">
+                        <strong>Contexto:</strong> Usuario con experiencia en compra de autos, tiene un auto específico en mente y necesita calcular opciones de financiamiento.
+                    </p>
+                    <div class="tasks">
+                        <strong>Tareas realizadas:</strong>
+                        <ul>
+                            <li>Buscar un auto específico en el catálogo</li>
+                            <li>Calcular diferentes planes de financiamiento</li>
+                            <li>Comparar opciones de enganche y plazos</li>
+                        </ul>
+                    </div>
+                    <div class="results">
+                        <h4>Resultados de evaluación:</h4>
+                        <ul>
+                            <li><strong>Satisfacción general:</strong> 9 / 10</li>
+                            <li><strong>Claridad de respuestas:</strong> 10 / 10</li>
+                            <li><strong>Éxito en completar la tarea:</strong> 10 / 10</li>
+                        </ul>
+                    </div>
+                    <div class="conversation-example">
+                        <h4>conversación que tuvo el usuario (ultimos 5 mensajes):</h4>
+                        <div class="conversation-item user">
+                            <div class="label">Usuario:</div>
+                            <div class="message">A ver pues necio dame el plan de financiamiento</div>
+                        </div>
+                        <div class="conversation-item agent">
+                            <div class="label">Agente:</div>
+                            <div class="message">El plan de financiamiento para el Honda Civic 2013 (precio $192,999 MXN) con un enganche del 20% ($38,599.80 MXN) y a 3 años te quedaría en pagos mensuales de $4,982.03 MXN. El interés total sería de $24,953.80 MXN y el monto total a pagar al final del plazo sería de $179,353 MXN. ¿Te gustaría ajustar el enganche o el plazo, o te ayudo a iniciar tu trámite?</div>
+                        </div>
+                        <div class="conversation-item user">
+                            <div class="label">Usuario:</div>
+                            <div class="message">Ta guapete el plan eh, si doy el 40% de enganche como queda el paquete?</div>
+                        </div>
+                        <div class="conversation-item agent">
+                            <div class="label">Agente:</div>
+                            <div class="message">Con un enganche del 40% ($77,199.60 MXN) para el Honda Civic 2013, el pago mensual sería de $3,736.52 MXN a 3 años. El interés total sería de $18,715.35 MXN y el monto total a pagar al final del plazo sería de $134,514.75 MXN. ¿Te gustaría avanzar con este plan o necesitas ajustar el plazo?</div>
+                        </div>
+                        <div class="conversation-item user">
+                            <div class="label">Usuario:</div>
+                            <div class="message">Vamos a avanzar con el plan</div>
+                        </div>
+                        <div class="conversation-item agent">
+                            <div class="label">Agente:</div>
+                            <div class="message">Perfecto, para avanzar con el plan de financiamiento del Honda Civic 2013 solo necesito tus datos de contacto (nombre, teléfono y correo). Así uno de nuestros asesores te contactará para continuar con el trámite y resolver cualquier duda adicional. ¿Me los puedes compartir?</div>
+                        </div>
+                        <div class="conversation-item user">
+                            <div class="label">Usuario:</div>
+                            <div class="message">Si claro. Me llamo Ruben Mendez 7772090784 y ruben@mail.com</div>
+                        </div>
+                        <div class="conversation-item agent">
+                            <div class="label">Agente:</div>
+                            <div class="message">¡Gracias, Rubén! Ya tengo tus datos. Un asesor de Kavak te contactará pronto para continuar con el trámite de financiamiento del Honda Civic 2013 y resolver cualquier duda que tengas. Si necesitas adelantar algún detalle o tienes otra pregunta, aquí estoy para ayudarte.</div>
+                        </div>
+                        <div class="conversation-item user">
+                            <div class="label">Usuario:</div>
+                            <div class="message">Excelente muchas gracias!</div>
+                        </div>
+                        <div class="conversation-item agent">
+                            <div class="label">Agente:</div>
+                            <div class="message">¡De nada, Rubén! Cualquier otra duda o si quieres cotizar otro auto, aquí estoy para ayudarte. ¡Gracias por confiar en Kavak!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="user-profile">
+                    <div class="user-profile-header">
+                        <div class="user-icon">👤</div>
+                        <h3>Perfil 3: Abogado</h3>
+                    </div>
+                    <p class="context">
+                        <strong>Contexto:</strong> Usuario curioso que quiere entender los beneficios y características únicas de Kavak antes de tomar una decisión.
+                    </p>
+                    <div class="tasks">
+                        <strong>Tareas realizadas:</strong>
+                        <ul>
+                            <li>Consultar información detallada sobre los beneficios de Kavak</li>
+                            <li>Conocer las sedes</li>
+                        </ul>
+                    </div>
+                    <div class="results">
+                        <h4>Resultados de evaluación:</h4>
+                        <ul>
+                            <li><strong>Satisfacción general:</strong> 9 / 10</li>
+                            <li><strong>Claridad de respuestas:</strong> 9 / 10</li>
+                            <li><strong>Éxito en completar la tarea:</strong> 9 / 10</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
         </section>
 
         <section>

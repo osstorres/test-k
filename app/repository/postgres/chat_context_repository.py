@@ -74,9 +74,6 @@ class ChatContextRepository:
                 )
                 session.add(db_interaction)
                 await session.flush()
-
-                await self._keep_last_n_interactions(session, interaction.user_id, n=5)
-
                 await session.commit()
                 await session.refresh(db_interaction)
 
