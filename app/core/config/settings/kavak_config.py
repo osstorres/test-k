@@ -47,8 +47,17 @@ class KavakTwilioSettings(BaseModel):
     SANDBOX_CODE: str | None = decouple.config("TWILIO_SANDBOX_CODE", default=None)
 
 
+class ArizeSettings(BaseModel):
+    SPACE_ID: str | None = decouple.config("ARIZE_SPACE_ID", default=None)
+    API_KEY: str | None = decouple.config("ARIZE_API_KEY", default=None)
+    PROJECT_NAME: str = decouple.config(
+        "ARIZE_PROJECT_NAME", default="kavak-agent-llamaindex"
+    )
+
+
 class KavakSettings(BaseModel):
     llm: KavakLLMSettings = KavakLLMSettings()
     qdrant: KavakQdrantSettings = KavakQdrantSettings()
     mem0: KavakMem0Settings = KavakMem0Settings()
     twilio: KavakTwilioSettings = KavakTwilioSettings()
+    arize: ArizeSettings = ArizeSettings()

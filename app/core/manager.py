@@ -9,6 +9,7 @@ from app.core.config.settings.environments import (
     ProdSettings,
 )
 from app.core.config.settings.base_config import ApplicationSettings
+from app.core.config.tracing import setup_arize_tracing
 
 
 class Singleton(type):
@@ -40,6 +41,14 @@ def get_settings() -> ApplicationSettings:
 
 @asynccontextmanager
 async def lifespan(app):
+    try:
+        settings_instance = get_settings()
+        tracer_provider = setup_arize_tracing(settings_instance.kavak.arize)
+        if tracer_provider:
+            logger.info("Arize AX tracing initialized successfully")
+    except Exception as e:
+        logger.warning(f"Failed to initialize Arize AX tracing: {e}")
+
     try:
         yield
     finally:
