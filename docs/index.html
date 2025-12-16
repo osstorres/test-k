@@ -210,6 +210,34 @@
             font-style: normal;
         }
 
+        .demo-section {
+            text-align: center;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .demo-section h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 30px;
+            border: none;
+            padding: 0;
+        }
+
+        .demo-video {
+            max-width: 100%;
+            width: 100%;
+            max-width: 900px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            margin: 0 auto;
+            display: block;
+        }
+
         footer {
             text-align: center;
             margin-top: 60px;
@@ -251,6 +279,14 @@
                 <a href="https://github.com/osstorres/test-k" target="_blank" style="font-size: 0.95em;">Ver código en GitHub →</a>
             </p>
         </header>
+
+        <section class="demo-section">
+            <h2>🎬 Demo del Agente</h2>
+            <video class="demo-video" controls autoplay muted loop preload="metadata" playsinline>
+                <source src="https://raw.githubusercontent.com/osstorres/test-k/main/docs/record.MP4" type="video/mp4">
+                <p>Tu navegador no soporta la reproducción de videos HTML5. <a href="https://raw.githubusercontent.com/osstorres/test-k/main/docs/record.MP4">Descarga el video aquí</a>.</p>
+            </video>
+        </section>
 
         <section>
             <h2>Introducción</h2>
@@ -830,7 +866,6 @@ graph TB
                     <li><strong>Tiempo de respuesta promedio:</strong> Actualmente 1-7 segundos. Objetivo: mantener o mejorar este rango</li>
                     <li><strong>Latencia del sistema:</strong> Tiempo desde la recepción del mensaje hasta la respuesta completa</li>
                     <li><strong>Disponibilidad del servicio:</strong> Porcentaje de tiempo que el agente está operativo</li>
-                    <li><strong>[PLACEHOLDER]</strong> - Métrica adicional de rendimiento</li>
                 </ul>
             </div>
 
@@ -840,7 +875,6 @@ graph TB
                     <li><strong>Precisión de respuestas:</strong> Porcentaje de respuestas correctas y relevantes</li>
                     <li><strong>Satisfacción del usuario:</strong> Feedback y calificaciones de los usuarios</li>
                     <li><strong>Tasa de resolución:</strong> Porcentaje de consultas resueltas sin necesidad de intervención humana</li>
-                    <li><strong>[PLACEHOLDER]</strong> - Métrica adicional de calidad</li>
                 </ul>
             </div>
 
@@ -850,7 +884,6 @@ graph TB
                     <li><strong>Volumen de interacciones:</strong> Número total de conversaciones y mensajes procesados</li>
                     <li><strong>Tasa de conversión:</strong> Porcentaje de usuarios que completan acciones deseadas (consultas de autos, cálculos de financiamiento, etc.)</li>
                     <li><strong>Engagement del usuario:</strong> Duración promedio de las conversaciones y número de mensajes por sesión</li>
-                    <li><strong>[PLACEHOLDER]</strong> - Métrica adicional de negocio</li>
                 </ul>
             </div>
 
@@ -860,7 +893,6 @@ graph TB
                     <li><strong>Uso de herramientas:</strong> Frecuencia de uso de cada herramienta (RAG, catálogo, financiamiento)</li>
                     <li><strong>Errores y fallos:</strong> Tasa de errores en las respuestas del agente</li>
                     <li><strong>Uso de recursos:</strong> Consumo de tokens de OpenAI, consultas a bases de datos, etc.</li>
-                    <li><strong>[PLACEHOLDER]</strong> - Métrica técnica adicional</li>
                 </ul>
             </div>
         </section>
