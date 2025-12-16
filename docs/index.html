@@ -474,6 +474,26 @@ graph LR
                     La factory de workflows está en <a href="https://github.com/osstorres/test-k/tree/main/app/domain/agent_kavak/workflows/factory.py" target="_blank" class="code-link">app/domain/agent_kavak/workflows/factory.py</a>, y la fachada del agente en <a href="https://github.com/osstorres/test-k/tree/main/app/domain/agent_kavak/facade.py" target="_blank">app/domain/agent_kavak/facade.py</a>.
                 </p>
             </div>
+
+            <div class="phase">
+                <h3>Implementación de monitoreo con Arize</h3>
+                <p>
+                    Se implementó Arize para monitorear el comportamiento del LLM y el agente en tiempo real. Arize nos permite rastrear y analizar métricas clave del sistema, incluyendo latencia, uso de tokens, llamadas a herramientas y el flujo completo de ejecución del agente.
+                </p>
+                <p>
+                    Con Arize podemos observar:
+                </p>
+                <ul>
+                    <li><span class="highlight">Traces y Spans:</span> Seguimiento detallado de cada ejecución del agente, incluyendo los diferentes pasos del workflow ReAct</li>
+                    <li><span class="highlight">Métricas de LLM:</span> Latencia de las llamadas a OpenAI, consumo de tokens, y rendimiento de los modelos</li>
+                    <li><span class="highlight">Uso de herramientas:</span> Monitoreo de qué herramientas se invocan y con qué frecuencia</li>
+                    <li><span class="highlight">Agent Graph y Agent Path:</span> Visualización del flujo de ejecución del agente para entender mejor su comportamiento</li>
+                    <li><span class="highlight">Sesiones:</span> Agrupación de interacciones relacionadas para análisis de conversaciones completas</li>
+                </ul>
+                <p>
+                    La configuración de Arize está implementada en <a href="https://github.com/osstorres/test-k/tree/main/app/core/config/tracing/arize_config.py" target="_blank" class="code-link">app/core/config/tracing/arize_config.py</a>, y se integra con el sistema de tracing del proyecto.
+                </p>
+            </div>
         </section>
 
         <section>
