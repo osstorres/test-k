@@ -210,6 +210,34 @@
             font-style: normal;
         }
 
+        .demo-section {
+            text-align: center;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .demo-section h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 30px;
+            border: none;
+            padding: 0;
+        }
+
+        .demo-video {
+            max-width: 100%;
+            width: 100%;
+            max-width: 900px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            margin: 0 auto;
+            display: block;
+        }
+
         footer {
             text-align: center;
             margin-top: 60px;
@@ -251,6 +279,14 @@
                 <a href="https://github.com/osstorres/test-k" target="_blank" style="font-size: 0.95em;">Ver código en GitHub →</a>
             </p>
         </header>
+
+        <section class="demo-section">
+            <h2>🎬 Demo del Agente</h2>
+            <video class="demo-video" controls autoplay muted loop>
+                <source src="https://raw.githubusercontent.com/osstorres/test-k/main/docs/record.MP4" type="video/mp4">
+                Tu navegador no soporta la reproducción de videos.
+            </video>
+        </section>
 
         <section>
             <h2>Introducción</h2>
