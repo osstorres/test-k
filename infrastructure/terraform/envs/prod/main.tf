@@ -67,34 +67,3 @@ resource "aws_security_group" "app_runner_vpc" {
   tags = local.common_tags
 }
 
-
-module "test-k" {
-  source = "../../modules/app-runner"
-
-  environment = local.environment
-  tags        = local.common_tags
-
-  service_name       = local.katest_service_name
-  ecr_repository_url = module.ecr.repository_urls[local.katest_service_name]
-  image_tag          = "latest"
-
-  container_port = 8000
-
-  create_vpc_connector   = true
-  vpc_id                 = module.vpc.vpc_id
-  subnet_ids             = module.vpc.private_subnet_ids
-  is_publicly_accessible = true
-
-  existing_security_group_id = aws_security_group.app_runner_vpc.id
-
-  custom_domain_name = "test.elosos.xyz"
-  environment_variables = {
-
-  }
-
-  min_size = 1
-  max_size = 2
-  max_concurrency = 20
-  cpu = "1024"
-  memory = "2048"
-}
